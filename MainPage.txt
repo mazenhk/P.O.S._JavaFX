@@ -1,0 +1,2683 @@
+﻿/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package adv_prjct_pos;
+
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+import java.io.IOException;
+import javafx.beans.property.SimpleStringProperty;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Application;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author hk
+ */
+public class MainPage extends Application {
+    
+    private Stage stage = new Stage();
+    
+    ComboBox TypeComboBox1;
+    ComboBox DebtPrsnCB;
+    ComboBox NameCB;
+    ComboBox SplrNmAcntComboBox;
+    ComboBox SrchSplrCB;
+    ComboBox SupllierAddCB;
+    ComboBox RtrnToStockCB;
+    
+    Spinner QuntSpnrPurTF;
+    
+    TextField RcptTF;
+    TextField PaidTF;
+    TextField BrcdTF;
+    TextField OvrAllDiscTF;
+    TextField RsltPurTF;
+    TextField RsltDlrPurTF;
+    TextField RcvdTF;
+    TextField RtrnTF;
+    TextField DrgAMntTF;
+    TextField DrgNmTF;
+    TextArea DrgRsnTF;
+    
+    Button RtrnPrdctBtn;
+    Button SplrRcptRetrnBTn;
+    Button DltPrdctPurBtn;
+    Button PayBtn;
+    Button RsltPurBtn;
+    Button FnshBtn;
+    Button RetunPurBtn;
+    Button DragBtn;
+    
+    ToggleButton DebtTglBtnPur;
+    RadioButton DollarRadioButton;
+    RadioButton LLRadioButton;
+    
+    TableView<PurchaseProducts> PurchaseTable;
+    TableColumn<PurchaseProducts,String> PrdctClmn;
+    TableColumn<PurchaseProducts,String> CodeClmn;
+    TableColumn<PurchaseProducts,Double> CostClmn;
+    TableColumn<PurchaseProducts,Double> PriceClmn;
+    TableColumn<PurchaseProducts,Integer> QuntClmn;
+    TableColumn<PurchaseProducts,Double> DscntClmn;
+    TableColumn<PurchaseProducts,Double> StckAmntClmn;
+    TableColumn<PurchaseProducts,String> DscrptClmn;
+    
+    TableView<EmpResults> EmpResultsTable;
+    TableColumn<EmpResults,String> IDClmn;
+    TableColumn<EmpResults,String> nameClmn;
+    TableColumn<EmpResults,Double> salaryClmn;
+    TableColumn<EmpResults,String> dateClmn;
+    TableColumn<EmpResults,Double> paymentClmn;
+    TableColumn<EmpResults,Double> remainedClmn;
+     
+    TableView<Results> ResultsTable;
+    TableView<Results> ResultsTable1;
+    TableView<Results> ResultsTable2;
+    TableColumn<Results,String> BrcdClmn;
+    TableColumn<Results,String> namePrdctClmn;
+    TableColumn<Results,Double> CosttClmn;
+    TableColumn<Results,Double> PriceeClmn;
+    TableColumn<Results,Double> ProfitClmn;
+    TableColumn<Results,String> TypeClmn;
+    TableColumn<Results,Double> DscnttClmn;
+    TableColumn<Results,Double> TTlDscnttClmn;
+    TableColumn<Results,Double> QuantityClmn;
+    TableColumn<Results,Double> RmndQuntClmn;
+    TableColumn<Results,String> SplrClmn;
+    TableColumn<Results,Double> VATClmn;
+    TableColumn<Results,Double> LastModifiedDateClmn;
+    TableColumn<Results,Double> ExpryDateClmn;
+    TableColumn<Results,String> DscrpttClmn;
+    TableColumn<Results,String> ClntClmn;
+        
+    CheckMenuItem CheckBoxMenuItem;
+    
+    public Stage getStage(){
+        return stage;
+    }
+    
+    @Override
+    public void start(Stage primaryStage) throws ClassNotFoundException {
+
+//        MainPageMethods mpm = new MainPageMethods();
+        
+        //Menus
+        MenuBar mn = new MenuBar();
+        
+        Menu m = new Menu("Menu");
+        m.show();
+        
+        CheckBoxMenuItem = new CheckMenuItem("Stock Alert!");
+        
+        m.getItems().add(0,CheckBoxMenuItem);
+        mn.getMenus().add(m);
+        
+        Pane mainPane = new Pane();
+        
+        //Purchase Pane begins~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //CpmboBox
+        TypeComboBox1 = new ComboBox();
+        
+        DebtPrsnCB = new ComboBox();
+        DebtPrsnCB.setMinWidth(150);
+        
+        NameCB = new ComboBox();
+        NameCB.setMinWidth(150);
+        
+        //Label
+        Label RcptID = new Label("Receipt ID:");
+        Label prdctLbl = new Label("Product Name:");
+        Label xLbl = new Label("x");
+        Label paidLbl = new Label("Paid:");
+        Label BrcdLbl = new Label("Barcode:");
+        Label AllDscntLbl = new Label("Net Discount:");
+        
+        QuntSpnrPurTF = new Spinner();
+        
+        //TextFields
+        RcptTF = new TextField();
+        PaidTF = new TextField();
+        BrcdTF = new TextField();
+        OvrAllDiscTF = new TextField();
+        
+        TabPane tabPane = new TabPane();
+        
+        Tab Purchasetab1 = new Tab("Purchase");
+        
+        //BorderPane PurchasesubBPane = new BorderPane();
+        
+        //Buttons
+        RtrnPrdctBtn = new Button("Manage Receipt");
+        
+        SplrRcptRetrnBTn = new Button("Debit Note");
+        
+        DltPrdctPurBtn = new Button("Return to stock");
+        DltPrdctPurBtn.setWrapText(true);
+        DltPrdctPurBtn.setMaxWidth(90);
+        DltPrdctPurBtn.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+//                    mpm.DltPrdctPurBtnActionPerformed(event);
+                } catch (Exception ex) {
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                    JOptionPane.showMessageDialog(null,
+                        "Something went wrong!!",
+                        "Error Message",
+                        JOptionPane.ERROR_MESSAGE);                }
+            }
+        });
+        
+        
+        PayBtn = new Button("Pay");
+        PayBtn.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                /*try {
+//                    mpm.PayBtnActionPerformed(event);
+                } catch (SQLException ex) {
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                    JOptionPane.showMessageDialog(null,
+                        "Something wrong with your database!!",
+                        "Error Message",
+                        JOptionPane.ERROR_MESSAGE);                
+                }*/
+            }
+        });
+        
+        DebtTglBtnPur = new ToggleButton("Debit");
+        
+        DebtTglBtnPur.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                //System.out.println("Hello World!");
+            }
+        });
+        
+        //Tables
+        PurchaseTable = new TableView<PurchaseProducts>();
+        PurchaseTable.setTableMenuButtonVisible(true);
+        
+        int PrdctTbWidth = 875;
+        PurchaseTable.setMinWidth(PrdctTbWidth);
+        PurchaseTable.setMaxHeight(300);
+        PurchaseTable.setLayoutX(10);
+        PurchaseTable.setLayoutY(220);
+        
+        PrdctClmn = new TableColumn<PurchaseProducts,String>("Product");
+        PrdctClmn.setCellValueFactory(new PropertyValueFactory<>("product"));
+        PrdctClmn.setMinWidth(PrdctTbWidth/8);
+       
+        CodeClmn = new TableColumn<PurchaseProducts,String>("Code");
+        CodeClmn.setCellValueFactory(new PropertyValueFactory<>("code"));
+        CodeClmn.setMinWidth(PrdctTbWidth/8);
+        
+        CostClmn = new TableColumn<PurchaseProducts,Double>("Cost");
+        CostClmn.setCellValueFactory(new PropertyValueFactory<>("cost"));
+        CostClmn.setMinWidth(PrdctTbWidth/8);
+        
+        PriceClmn = new TableColumn<PurchaseProducts,Double>("Price");
+        PriceClmn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        PriceClmn.setMinWidth(PrdctTbWidth/8);
+        
+        QuntClmn = new TableColumn<PurchaseProducts,Integer>("Quantity");
+        QuntClmn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        QuntClmn.setMinWidth(PrdctTbWidth/8);
+        
+        DscntClmn = new TableColumn<PurchaseProducts,Double>("Discount %");
+        DscntClmn.setCellValueFactory(new PropertyValueFactory<>("discount"));
+        DscntClmn.setMinWidth(PrdctTbWidth/8);
+        
+        StckAmntClmn = new TableColumn<PurchaseProducts,Double>("Amount \nin stock");
+        StckAmntClmn.setCellValueFactory(new PropertyValueFactory<>("stock"));
+        StckAmntClmn.setMinWidth(PrdctTbWidth/8);
+        
+        DscrptClmn = new TableColumn<PurchaseProducts,String>("Discription");
+        DscrptClmn.setCellValueFactory(new PropertyValueFactory<>("discription"));
+        DscrptClmn.setMinWidth(PrdctTbWidth/8);
+        
+        PurchaseTable.getColumns().addAll(PrdctClmn,CodeClmn,CostClmn,PriceClmn,QuntClmn,DscntClmn,StckAmntClmn,DscrptClmn);
+        
+        RsltPurBtn = new Button("Add");
+        RsltPurBtn.setLayoutX(20);
+        RsltPurBtn.setLayoutY(530);
+        RsltPurBtn.setMinSize(100, 50);
+        
+        RsltPurBtn.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                
+                /*try {
+                    mpm.RsltPurBtnActionPerformed(event);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null,
+                        "Something wrong with your database!!",
+                        "Error Message",
+                        JOptionPane.ERROR_MESSAGE);
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                }*/
+            }
+        });
+        
+        FnshBtn = new Button("Finish");
+        FnshBtn.setLayoutX(20);
+        FnshBtn.setLayoutY(600);
+        FnshBtn.setMinSize(100, 50);
+        FnshBtn.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                
+                /*try {
+                    mpm.FnshBtnActionPerformed(event);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null,
+                        "Something wrong with your database!!",
+                        "Error Message",
+                        JOptionPane.ERROR_MESSAGE);
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                }*/
+            }
+        });
+        
+                
+        Label RsltLbl = new Label("Result:");
+        RsltLbl.setLayoutX(470);
+        RsltLbl.setLayoutY(530);
+        RsltLbl.setFont(new Font(20));
+        
+        RsltPurTF = new TextField();
+        RsltDlrPurTF = new TextField();
+        RsltPurTF.setLayoutX(550);
+        RsltPurTF.setLayoutY(530);
+        RsltPurTF.setFont(new Font(20));
+        RsltPurTF.setEditable(false);
+        RsltDlrPurTF.setEditable(false);
+        
+        Label LLLbl = new Label("L.L.");
+        LLLbl.setLayoutX(820);
+        LLLbl.setLayoutY(590);
+        LLLbl.setFont(new Font(20));
+        
+        RsltDlrPurTF.setLayoutX(550);
+        RsltDlrPurTF.setLayoutY(590);
+        RsltDlrPurTF.setFont(new Font(20));
+        
+        Label DlrLbl = new Label("$");
+        DlrLbl.setLayoutX(820);
+        DlrLbl.setLayoutY(530);
+        DlrLbl.setFont(new Font(20));
+        
+        //======================================================================
+        Pane CashOutsubPane = new Pane();
+        CashOutsubPane.setStyle("-fx-background-color: gray");
+        CashOutsubPane.setMinSize(450, 250);
+        Label CashOutLbl = new Label("Cash Out");
+        CashOutLbl.setLayoutX(10);
+        CashOutLbl.setLayoutY(5);
+        CashOutLbl.setUnderline(true);
+        CashOutLbl.setFont(new Font(20));
+        Label RcvdLbl = new Label("Recieved:");
+        RcvdLbl.setLayoutX(10);
+        RcvdLbl.setLayoutY(50);
+        RcvdTF = new TextField();
+        RcvdTF.setLayoutX(100);
+        RcvdTF.setLayoutY(50);
+        LLRadioButton = new RadioButton("L.L.");
+        LLRadioButton.setLayoutX(300);
+        LLRadioButton.setLayoutY(50);
+        LLRadioButton.setSelected(true);
+        DollarRadioButton = new RadioButton("$");
+        DollarRadioButton.setLayoutX(300);
+        DollarRadioButton.setLayoutY(80);
+        ToggleGroup buttonGroupPur = new ToggleGroup();
+        buttonGroupPur.getToggles().addAll(DollarRadioButton,LLRadioButton);
+        Label RtrnLbl = new Label("Return:");
+        RtrnLbl.setLayoutX(10);
+        RtrnLbl.setLayoutY(100);
+        RtrnTF = new TextField();
+        RtrnTF.setLayoutX(100);
+        RtrnTF.setLayoutY(100);
+        
+        RetunPurBtn = new Button("Return");
+        RetunPurBtn.setLayoutX(100);
+        RetunPurBtn.setLayoutY(150);
+        RetunPurBtn.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+//                mpm.RetunPurBtnActionPerformed(event);
+            }
+            
+        });
+        CashOutsubPane.getChildren().addAll(CashOutLbl,RcvdLbl,RcvdTF,RtrnLbl,RtrnTF,RetunPurBtn,LLRadioButton,DollarRadioButton);
+        
+        CashOutsubPane.setLayoutX(900);
+        CashOutsubPane.setLayoutY(70);
+        //======================================================================
+        //======================================================================
+
+        VBox DragBoxsubPane = new VBox(15);
+        DragBoxsubPane.setPadding(new Insets(5,5,5,5));
+        DragBoxsubPane.setStyle("-fx-background-color: gray");
+        DragBoxsubPane.setMinSize(450, 300);
+        DragBoxsubPane.setSpacing(5);
+        
+        Label DragBoxLbl = new Label("Cash box dragged amount");
+        DragBoxLbl.setUnderline(true);
+        DragBoxLbl.setFont(new Font(20));
+        
+        HBox hb1 = new HBox(15);
+        hb1.setPadding(new Insets(15,15,15,15));
+        hb1.setSpacing(20);
+        Label AmntLbl = new Label("Amount:");
+        AmntLbl.setMinWidth(100);
+        DrgAMntTF = new TextField();
+        DrgAMntTF.setMinWidth(150);
+        hb1.getChildren().addAll(AmntLbl,DrgAMntTF);
+        hb1.setAlignment(Pos.CENTER_LEFT);
+        
+        HBox hb2 = new HBox(15);
+        hb2.setPadding(new Insets(15,15,15,15));
+        hb2.setSpacing(20);
+        Label DraggerLbl = new Label("Name:");
+        DraggerLbl.setMinWidth(100);
+        DrgNmTF = new TextField();
+        DrgNmTF.setMinWidth(150);
+        hb2.getChildren().addAll(DraggerLbl,DrgNmTF);
+        hb2.setAlignment(Pos.CENTER_LEFT);
+        
+        HBox hb3 = new HBox(15);
+        hb3.setPadding(new Insets(15,15,15,15));
+        hb3.setSpacing(20);
+        Label RsnLbl = new Label("Reason:");
+        RsnLbl.setMinWidth(100);
+        DrgRsnTF = new TextArea();
+        DrgRsnTF.setMaxSize(200, 50);
+        hb3.getChildren().addAll(RsnLbl,DrgRsnTF);
+        hb3.setAlignment(Pos.CENTER_LEFT);
+        
+        DragBtn = new Button("Drag");
+        HBox hb4 = new HBox(15);
+        hb4.setPadding(new Insets(15,15,15,15));
+        hb4.setSpacing(20);
+        hb4.getChildren().add(DragBtn);
+        hb4.setAlignment(Pos.CENTER);
+        DragBtn.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+               /* try {
+                    mpm.DragBtnActionPerformed(event);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null,
+                "Something wrong with your database!!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+                }*/
+            }
+            
+        });
+                
+        DragBoxsubPane.getChildren().addAll(DragBoxLbl,hb1,hb2,hb3,hb4);
+        
+        DragBoxsubPane.setLayoutX(900);
+        DragBoxsubPane.setLayoutY(350);
+        //======================================================================
+        //----------------------------------------------------------------------
+        Pane PurchasesubPane = new Pane();
+        PurchasesubPane.getChildren().addAll(DlrLbl,LLLbl,RsltDlrPurTF,RsltPurTF,RsltLbl,FnshBtn,RsltPurBtn,PurchaseTable,DragBoxsubPane,CashOutsubPane,SplrRcptRetrnBTn,RtrnPrdctBtn,DltPrdctPurBtn,OvrAllDiscTF,AllDscntLbl,BrcdTF,BrcdLbl,TypeComboBox1,PayBtn,PaidTF,paidLbl,QuntSpnrPurTF,xLbl,DebtTglBtnPur,DebtPrsnCB,NameCB,RcptID,RcptTF,prdctLbl);
+        //----------------------------------------------------------------------
+        PayBtn.setLayoutX(800);
+        PayBtn.setLayoutY(70);
+                
+        DebtTglBtnPur.setMinWidth(100);
+        DebtTglBtnPur.setLayoutX(20);
+        DebtTglBtnPur.setLayoutY(10);
+        
+        prdctLbl.setMinWidth(100);
+        prdctLbl.setLayoutX(20);
+        prdctLbl.setLayoutY(70);
+        
+        BrcdLbl.setMinWidth(100);
+        BrcdLbl.setLayoutX(20);
+        BrcdLbl.setLayoutY(110);
+        
+        AllDscntLbl.setMinWidth(100);
+        AllDscntLbl.setLayoutX(20);
+        AllDscntLbl.setLayoutY(150);
+        
+        DltPrdctPurBtn.setLayoutX(800);
+        DltPrdctPurBtn.setLayoutY(150);
+                
+        BrcdTF.setMinWidth(150);
+        BrcdTF.setLayoutX(150);
+        BrcdTF.setLayoutY(110);
+        
+        OvrAllDiscTF.setMinWidth(150);
+        OvrAllDiscTF.setLayoutX(150);
+        OvrAllDiscTF.setLayoutY(150);
+        
+        ////////////////////////////////////////////////////////////////////////
+        NameCB.setLayoutX(150);
+        NameCB.setLayoutY(70);
+        xLbl.setLayoutX(310);
+        xLbl.setLayoutY(70);
+        QuntSpnrPurTF.setLayoutX(330);
+        QuntSpnrPurTF.setLayoutY(70);
+        QuntSpnrPurTF.setMaxWidth(100);
+        QuntSpnrPurTF.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,150,1));
+        QuntSpnrPurTF.setEditable(true);
+        
+        NameCB.getItems().removeAll(NameCB.getItems());
+    /*    try{
+
+Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+            //step4 execute query
+            ResultSet rs=stmt.executeQuery("select NAME from ZINSTOCKKK where STILL = 'YES'");
+            
+            while(rs.next()){
+                NameCB.getItems().add(rs.getString("NAME"));
+            }
+
+            //step5 close the connection object
+            con.close();
+            NameCB.getSelectionModel().select(0);
+        }catch(SQLException e){             
+            JOptionPane.showMessageDialog(null,
+                "Something wrong with your database!!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null,
+                "Something wrong!!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+        }*/
+        ////////////////////////////////////////////////////////////////////////
+        DebtPrsnCB.setLayoutX(150);
+        DebtPrsnCB.setLayoutY(10);
+        /*try{
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+            ResultSet rs=stmt.executeQuery("select D_NAME from ZDEBTPPL");
+
+            while(rs.next()){
+                DebtPrsnCB.getItems().add(rs.getString("D_NAME"));
+            }
+
+            //step5 close the connection object
+            con.close();
+        DebtPrsnCB.getSelectionModel().select(0);
+        
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null,
+                "Something wrong with your database!!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null,
+                "Something wrong!!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+        }*/
+        ////////////////////////////////////////////////////////////////////////
+        RcptID.setLayoutX(500);
+        RcptID.setLayoutY(10);
+        paidLbl.setLayoutX(500);
+        paidLbl.setLayoutY(70);
+        
+        PaidTF.setLayoutX(600);
+        PaidTF.setLayoutY(70);
+        
+        TypeComboBox1.setLayoutX(600);
+        TypeComboBox1.setLayoutY(110);
+        TypeComboBox1.setMinWidth(185);
+        TypeComboBox1.getItems().addAll("Cash $","Cash L.L.","Check L.L.","Check $", "Visa L.L.", "Visa $","Master L.L.","Master $","Amex $", "Horizon $");
+        TypeComboBox1.getSelectionModel().select(0);
+        
+        RcptTF.setLayoutX(600);
+        RcptTF.setLayoutY(10);
+        RcptTF.setFont(new Font("Tahoma",15));
+        RcptTF.setEditable(false);
+        
+        RtrnPrdctBtn.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+           //     mpm.RtrnPrdctBtnActionPerformed(event);
+           ReturnFrame rf = new ReturnFrame();
+        rf.start(rf.getStage());
+            }
+        
+        });
+        RtrnPrdctBtn.setLayoutX(800);
+        RtrnPrdctBtn.setLayoutY(10);
+        
+        SplrRcptRetrnBTn.setLayoutX(1000);
+        SplrRcptRetrnBTn.setLayoutY(10);
+        
+        SplrRcptRetrnBTn.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+             //   mpm.SplrRcptRetrnBTnActionPerformed(event);
+              ReceiptReturn rc = new ReceiptReturn();
+        rc.start(rc.getStage());
+        
+            }
+        
+        });
+        /*
+        try{
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+            long id = 0;
+            ResultSet rs=stmt.executeQuery("select IDNUMD from IDS");
+            
+            while(rs.next())
+                id = rs.getLong("IDNUMD");
+    
+            RcptTF.setText(id+"");
+
+            con.close();
+            //PrintReceipt1 pr = new PrintReceipt1(plal);
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null,
+                "Something wrong with your database!!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null,
+                "Something wrong!!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+        }*/
+        
+        OvrAllDiscTF.setText("0");
+        ////////////////////////////////////////////////////////////////////////
+
+        PurchasesubPane.setPadding(new Insets(15,15,15,15));
+        Purchasetab1.setContent(PurchasesubPane);
+        //Purchase Pane end~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        //AER Pane Begin--------------------------------------------------------
+        Tab AERtab2 = new Tab("Add/Edit/Remove/New Product/Supplier");
+        HBox mainAERhb = new HBox(5);
+        mainAERhb.setPadding(new Insets(15,15,15,15));
+        mainAERhb.setSpacing(0);
+        AERtab2.setContent(mainAERhb);
+        
+        //======================================================================
+        VBox AERVBL = new VBox(15);
+        AERVBL.setPadding(new Insets(5,5,5,5));
+        AERVBL.setSpacing(10);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL1 = new HBox(15);
+        AERHBL1.setPadding(new Insets(5,5,5,5));
+        AERHBL1.setSpacing(10);
+        
+        Label BrcodLbl = new Label("Barcode:");
+        BrcodLbl.setMinWidth(100);
+        
+        TextField BrCDAddTF = new TextField();
+        BrCDAddTF.setMinWidth(150);
+        
+        AERHBL1.getChildren().addAll(BrcodLbl,BrCDAddTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL2 = new HBox(15);
+        AERHBL2.setPadding(new Insets(5,5,5,5));
+        AERHBL2.setSpacing(10);
+        
+        Label PrdctLbl = new Label("Product:");
+        PrdctLbl.setMinWidth(100);
+        
+        TextField NameAddTF = new TextField();
+        NameAddTF.setMinWidth(150);
+        
+        AERHBL2.getChildren().addAll(PrdctLbl,NameAddTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL3 = new HBox(15);
+        AERHBL3.setPadding(new Insets(5,5,5,5));
+        AERHBL3.setSpacing(10);
+        
+        Label CostLbl = new Label("Cost:");
+        CostLbl.setMinWidth(100);
+        
+        TextField CostaddTF = new TextField();
+        CostaddTF.setMinWidth(150);
+        
+        AERHBL3.getChildren().addAll(CostLbl,CostaddTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL4 = new HBox(15);
+        AERHBL4.setPadding(new Insets(5,5,5,5));
+        AERHBL4.setSpacing(10);
+        
+        Label PriceLbl = new Label("Price:");
+        PriceLbl.setMinWidth(100);
+        
+        TextField PriceAddTF = new TextField();
+        PriceAddTF.setMinWidth(150);
+        
+        AERHBL4.getChildren().addAll(PriceLbl,PriceAddTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL5 = new HBox(15);
+        AERHBL5.setPadding(new Insets(5,5,5,5));
+        AERHBL5.setSpacing(10);
+        
+        Label ProfitLbl = new Label("Profit:");
+        ProfitLbl.setMinWidth(100);
+        
+        TextField PrftAddTF = new TextField("0");
+        PrftAddTF.setMinWidth(150);
+        PrftAddTF.setEditable(false);
+        
+        AERHBL5.getChildren().addAll(ProfitLbl,PrftAddTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        HBox AERHBL6 = new HBox(15);
+        AERHBL6.setPadding(new Insets(5,5,5,5));
+        AERHBL6.setSpacing(10);
+        
+        Label TypeLbl = new Label("Type:");
+        TypeLbl.setMinWidth(100);
+        
+        TextField TypeTF = new TextField();
+        TypeTF.setMinWidth(150);
+        
+        AERHBL6.getChildren().addAll(TypeLbl,TypeTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL7 = new HBox(15);
+        AERHBL7.setPadding(new Insets(5,5,5,5));
+        AERHBL7.setSpacing(10);
+        
+        Label DscntLbl = new Label("Discount:");
+        DscntLbl.setMinWidth(100);
+        
+        TextField DscntAddTF = new TextField("0");
+        DscntAddTF.setMinWidth(150);
+        
+        Label PrcntgLbl = new Label("%");
+        PrcntgLbl.setMaxWidth(15);
+        
+        AERHBL7.getChildren().addAll(DscntLbl,DscntAddTF,PrcntgLbl);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL8 = new HBox(15);
+        AERHBL8.setPadding(new Insets(5,5,5,5));
+        AERHBL8.setSpacing(10);
+        
+        Label QuntLbl = new Label("Quantity:");
+        QuntLbl.setMinWidth(100);
+        
+        TextField QntitAddTF = new TextField();
+        QntitAddTF.setMinWidth(150);
+        
+        AERHBL8.getChildren().addAll(QuntLbl,QntitAddTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL9 = new HBox(15);
+        AERHBL9.setPadding(new Insets(5,5,5,5));
+        AERHBL9.setSpacing(10);
+        
+        Label QuntStckLbl = new Label("Stock Quantity:");
+        QuntStckLbl.setMinWidth(100);
+        
+        TextField QuntitSTAddTF = new TextField();
+        QuntitSTAddTF.setMinWidth(150);
+        QuntitSTAddTF.setEditable(false);
+        
+        AERHBL9.getChildren().addAll(QuntStckLbl,QuntitSTAddTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL10 = new HBox(15);
+        AERHBL10.setPadding(new Insets(5,5,5,5));
+        AERHBL10.setSpacing(10);
+        
+        Label SplrLbl = new Label("Supplier:");
+        SplrLbl.setMinWidth(100);
+        
+        SupllierAddCB = new ComboBox();
+        SupllierAddCB.setMinWidth(190);
+        
+        /*try{
+            /*
+            SupllierAddCB.getItems().removeAll(SupllierAddCB.getItems());
+            SplrNmAcntComboBox.getItems().removeAll(SplrNmAcntComboBox.getItems());
+            SrchSplrCB.getItems().removeAll(SrchSplrCB.getItems());
+            -----
+            
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            
+            Statement stmt = con.createStatement();
+            
+            //step4 execute query
+            ResultSet rs=stmt.executeQuery("select NAME from ZSUPPLIERS");
+
+            while(rs.next()){
+                SupllierAddCB.getItems().add(rs.getString("NAME"));
+                //SplrNmAcntComboBox.getItems().add(rs.getString("NAME"));
+                //SrchSplrCB.getItems().add(rs.getString("NAME"));
+            }
+
+            //step5 close the connection object
+            con.close();
+            SupllierAddCB.getSelectionModel().select(0);
+        }catch(Exception e){ System.out.println(e);}
+        */
+        
+        AERHBL10.getChildren().addAll(SplrLbl,SupllierAddCB);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL11 = new HBox(15);
+        AERHBL11.setPadding(new Insets(5,5,5,5));
+        AERHBL11.setSpacing(10);
+        
+        Label VATLbl = new Label("V.A.T.:");
+        VATLbl.setMinWidth(100);
+        
+        TextField VatTF = new TextField("0");
+        VatTF.setMinWidth(150);
+        
+        AERHBL11.getChildren().addAll(VATLbl,VatTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL12 = new HBox(15);
+        AERHBL12.setPadding(new Insets(5,5,5,5));
+        AERHBL12.setSpacing(10);
+        
+        Label EntryDateLbl = new Label("Entery Date:");
+        EntryDateLbl.setMinWidth(100);
+        
+        TextField DateAddTF = new TextField("YYYY/MM/DD");
+        DateAddTF.setMinWidth(150);
+        DateAddTF.setEditable(false);
+        
+        AERHBL12.getChildren().addAll(EntryDateLbl,DateAddTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBL13 = new HBox(15);
+        AERHBL13.setPadding(new Insets(5,5,5,5));
+        AERHBL13.setSpacing(10);
+        
+        Label ExprDateLbl = new Label("Expiry Date:");
+        ExprDateLbl.setMinWidth(100);
+        
+        DatePicker ExprDateAddDtPk = new DatePicker();
+        ExprDateAddDtPk.setMinWidth(150);
+        
+        AERHBL13.getChildren().addAll(ExprDateLbl,ExprDateAddDtPk);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        AERVBL.getChildren().addAll(AERHBL1,AERHBL2,AERHBL3,AERHBL4,AERHBL5,AERHBL6,AERHBL7,AERHBL8,AERHBL9,AERHBL10,AERHBL11,AERHBL12,AERHBL13);
+        AERVBL.setStyle("-fx-background-color: gray");
+        //======================================================================
+        VBox AERVBC = new VBox(15);
+        AERVBC.setPadding(new Insets(5,5,5,5));
+        AERVBC.setSpacing(10);
+        AERVBC.setStyle("-fx-background-color: gray");
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBC1 = new HBox(15);
+        AERHBC1.setPadding(new Insets(5,5,5,5));
+        AERHBC1.setSpacing(10);
+        
+        Label DscrpLbl = new Label("Dscription:");
+        DscrpLbl.setMinWidth(100);
+        
+        TextArea DscrAddTF = new TextArea();
+        DscrAddTF.setPrefWidth(350);
+        DscrAddTF.setPrefHeight(250);
+        
+        AERHBC1.getChildren().addAll(DscrpLbl,DscrAddTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBC2 = new HBox(15);
+        AERHBC2.setPadding(new Insets(5,5,5,5));
+        AERHBC2.setSpacing(10);
+        
+        Button ShowBtn = new Button("Show");
+        ShowBtn.setPrefHeight(50);
+        
+        Button EditBtn = new Button("Edit\n(Press \"Show\" before)");
+        EditBtn.setWrapText(true);
+        
+        Button RmvAddBtn = new Button("Remove\n(Only Product name needed)");
+        RmvAddBtn.setWrapText(true);
+        
+        AERHBC2.getChildren().addAll(ShowBtn,EditBtn,RmvAddBtn);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        GridPane AERGPC = new GridPane();
+        AERGPC.setPadding(new Insets(15,15,15,15));
+        AERGPC.setHgap(10);
+        AERGPC.setVgap(10);
+        
+        Label RtrnTitleLbl = new Label("Return to Stock");
+        RtrnTitleLbl.setUnderline(true);
+        RtrnTitleLbl.setFont(new Font(20));
+        
+        Label DltdLbl = new Label("Deleted Products:");
+        
+        RtrnToStockCB = new ComboBox();
+        RtrnToStockCB.setPrefWidth(250);
+        /*
+        try{
+
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+            //step4 execute query  
+            ResultSet rs=stmt.executeQuery("select NAME from ZINSTOCKKK where STILL = 'NO'");  
+
+            while(rs.next()){
+                RtrnToStockCB.getItems().add(rs.getString("NAME"));
+            }
+
+            RtrnToStockCB.getSelectionModel().select(0);
+            //step5 close the connection object  
+            con.close();  
+  
+            } catch (SQLException ex) {
+                    Logger.getLogger(MainPage.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                    JOptionPane.showMessageDialog(null,
+                        "Something wrong with your database!!",
+                        "Error Message",
+                        JOptionPane.ERROR_MESSAGE);
+            }catch(Exception e){ JOptionPane.showMessageDialog(null,
+                        "Something went wrong!!",
+                        "Error Message",
+                        JOptionPane.ERROR_MESSAGE);}
+        */
+                        
+        Button RtrnToStockBtn = new Button("Return");
+
+        AERGPC.add(RtrnTitleLbl, 0, 0);
+        AERGPC.add(DltdLbl, 0, 1);
+        AERGPC.add(RtrnToStockCB, 1, 1);
+        AERGPC.add(RtrnToStockBtn, 1, 2);
+        AERGPC.setStyle("-fx-background-color: silver");
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        AERVBC.getChildren().addAll(AERHBC1,AERHBC2,AERGPC);
+        //======================================================================
+        VBox AERVBR = new VBox(15);
+        AERVBR.setPadding(new Insets(5,5,5,5));
+        AERVBR.setSpacing(10);
+        
+        Label SplrsTitleLbl = new Label("Suppliers Settings");
+        SplrsTitleLbl.setUnderline(true);
+        SplrsTitleLbl.setFont(new Font(20));
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox AERHBR1 = new HBox(15);
+        AERHBR1.setPadding(new Insets(5,5,5,5));
+        AERHBR1.setSpacing(10);
+        
+        Label SplrNmLbl = new Label("Name:");
+        SplrNmLbl.setPrefWidth(150);
+        
+        TextField NameSplrTF = new TextField();
+        NameSplrTF.setPrefWidth(250);
+        
+        AERHBR1.getChildren().addAll(SplrNmLbl,NameSplrTF);
+                
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+        HBox AERHBR2 = new HBox(15);
+        AERHBR2.setPadding(new Insets(5,5,5,5));
+        AERHBR2.setSpacing(10);
+        
+        Label CmpnyNmLbl = new Label("Company Name:");
+        CmpnyNmLbl.setPrefWidth(150);
+        
+        TextField CmpnySplrTF = new TextField();
+        CmpnySplrTF.setPrefWidth(250);
+        
+        AERHBR2.getChildren().addAll(CmpnyNmLbl,CmpnySplrTF);
+                
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+        HBox AERHBR3 = new HBox(15);
+        AERHBR3.setPadding(new Insets(5,5,5,5));
+        AERHBR3.setSpacing(10);
+        
+        Label AddressLbl = new Label("Address:");
+        AddressLbl.setPrefWidth(150);
+        
+        TextField AdrsSplrTF = new TextField();
+        AdrsSplrTF.setPrefWidth(250);
+        
+        AERHBR3.getChildren().addAll(AddressLbl,AdrsSplrTF);
+                
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+        HBox AERHBR4 = new HBox(15);
+        AERHBR4.setPadding(new Insets(5,5,5,5));
+        AERHBR4.setSpacing(10);
+        
+        Label PhoneLbl = new Label("Phone number:");
+        PhoneLbl.setPrefWidth(150);
+        
+        TextField PhnSplrTF = new TextField();
+        PhnSplrTF.setPrefWidth(250);
+        
+        AERHBR4.getChildren().addAll(PhoneLbl,PhnSplrTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+        HBox AERHBR5 = new HBox(15);
+        AERHBR5.setPadding(new Insets(5,5,5,5));
+        AERHBR5.setSpacing(10);
+        
+        Label EmailLbl = new Label("Email:");
+        EmailLbl.setPrefWidth(150);
+        
+        TextField EmailSplrTF = new TextField();
+        EmailSplrTF.setPrefWidth(250);
+        
+        AERHBR5.getChildren().addAll(EmailLbl,EmailSplrTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+        HBox AERHBR6 = new HBox(15);
+        AERHBR6.setPadding(new Insets(5,5,5,5));
+        AERHBR6.setSpacing(10);
+        
+        Label SplrIftitahiLbl = new Label("Acount amount:");
+        SplrIftitahiLbl.setPrefWidth(150);
+        
+        TextField SplrIftitahiTF = new TextField();
+        SplrIftitahiTF.setPrefWidth(250);
+        
+        AERHBR6.getChildren().addAll(SplrIftitahiLbl,SplrIftitahiTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+        HBox AERHBR7 = new HBox(15);
+        AERHBR7.setPadding(new Insets(5,5,5,5));
+        AERHBR7.setSpacing(10);
+        
+        Button AddSplrBtn = new Button("Add");
+        AddSplrBtn.setPrefWidth(150);
+        
+        Button RmvSplrBtn = new Button("Delete");
+        RmvSplrBtn.setPrefWidth(150);
+        
+        AERHBR7.getChildren().addAll(AddSplrBtn,RmvSplrBtn);
+        AERHBR7.setAlignment(Pos.CENTER);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+        HBox AERHBR8 = new HBox(15);
+        AERHBR8.setPadding(new Insets(5,5,5,5));
+        AERHBR8.setSpacing(10);
+        
+        Button ShowSplrBtn = new Button("Show");
+        ShowSplrBtn.setPrefWidth(150);
+        ShowSplrBtn.setPrefHeight(70);
+        
+        Button EditSplrBtn = new Button("Edit\n(Press \"Show\" \nbutton before)");
+        EditSplrBtn.setPrefWidth(150);
+        
+        AERHBR8.getChildren().addAll(ShowSplrBtn,EditSplrBtn);
+        AERHBR8.setAlignment(Pos.CENTER);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+        
+        AERVBR.getChildren().addAll(SplrsTitleLbl,AERHBR1,AERHBR2,AERHBR3,AERHBR4,AERHBR5,AERHBR6,AERHBR7,AERHBR8);
+        //======================================================================
+        mainAERhb.getChildren().addAll(AERVBL,AERVBC,AERVBR);
+        //AER Pane end----------------------------------------------------------
+        //NSDtab3 begin---------------------------------------------------------
+        Tab NSDtab3 = new Tab("New User/Client/Employee");
+        HBox mainNSDhb = new HBox(5);
+        mainNSDhb.setPadding(new Insets(15,15,15,15));
+        mainNSDhb.setSpacing(0);
+        NSDtab3.setContent(mainNSDhb);
+        
+        //======================================================================
+        VBox NSDVB1 = new VBox(15);
+        NSDVB1.setPadding(new Insets(15,15,15,15));
+        NSDVB1.setSpacing(15);
+        
+        Label UserTitleLbl = new Label("Users Settings");
+        UserTitleLbl.setUnderline(true);
+        UserTitleLbl.setFont(new Font(20));
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD1hb1 = new HBox(15);
+        NSD1hb1.setPadding(new Insets(5,5,5,5));
+        NSD1hb1.setSpacing(10);
+        
+        Label NameUserLbl = new Label("Name:");
+        NameUserLbl.setMinWidth(100);
+        
+        TextField NameUserTF = new TextField();
+        NameUserTF.setPrefWidth(200);
+        
+        NSD1hb1.getChildren().addAll(NameUserLbl,NameUserTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD1hb2 = new HBox(15);
+        NSD1hb2.setPadding(new Insets(5,5,5,5));
+        NSD1hb2.setSpacing(10);
+        
+        Label UserNameLbl = new Label("Username:");
+        UserNameLbl.setMinWidth(100);
+        
+        TextField UsrNmUserTF = new TextField();
+        UsrNmUserTF.setPrefWidth(200);
+        
+        NSD1hb2.getChildren().addAll(UserNameLbl,UsrNmUserTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD1hb3 = new HBox(15);
+        NSD1hb3.setPadding(new Insets(5,5,5,5));
+        NSD1hb3.setSpacing(10);
+        
+        Label PassLbl = new Label("Password:");
+        PassLbl.setMinWidth(100);
+        
+        PasswordField PswdUserTF = new PasswordField();
+        PswdUserTF.setPrefWidth(200);
+        
+        NSD1hb3.getChildren().addAll(PassLbl,PswdUserTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD1hb4 = new HBox(15);
+        NSD1hb4.setPadding(new Insets(5,5,5,5));
+        NSD1hb4.setSpacing(10);
+        
+        Label HintLbl = new Label("Hint:");
+        HintLbl.setMinWidth(100);
+        
+        TextField HintUserTF = new TextField();
+        HintUserTF.setPrefWidth(200);
+        
+        NSD1hb4.getChildren().addAll(HintLbl,HintUserTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD1hb5 = new HBox(15);
+        NSD1hb5.setPadding(new Insets(5,5,5,5));
+        NSD1hb5.setSpacing(10);
+        
+        Label PosLbl = new Label("Position:");
+        PosLbl.setMinWidth(100);
+        
+        RadioButton AdminRadioBtn = new RadioButton("Admin");
+        RadioButton UserRadioBtn = new RadioButton("User");
+        ToggleGroup AdmUsrGrp = new ToggleGroup();
+        AdmUsrGrp.getToggles().addAll(AdminRadioBtn,UserRadioBtn);
+        AdminRadioBtn.setSelected(true);
+        
+        NSD1hb5.getChildren().addAll(PosLbl,AdminRadioBtn,UserRadioBtn);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+        Button AddUserBtn = new Button("Add");
+        AddUserBtn.setPrefSize(200, 80);
+        AddUserBtn.setFont(new Font(20));
+        
+        Button ChngPassBtn = new Button("Change Password");
+        ChngPassBtn.setPrefSize(200, 80);
+        ChngPassBtn.setFont(new Font(20));
+        
+        Button RmvUserBtn = new Button("Delete User\n(Only need\n UserName)");
+        RmvUserBtn.setPrefSize(200, 100);
+        RmvUserBtn.setFont(new Font(20));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        //----------------------------------------------------------------------
+        NSDVB1.getChildren().addAll(UserTitleLbl,NSD1hb1,NSD1hb2,NSD1hb3,NSD1hb4,NSD1hb5,AddUserBtn,ChngPassBtn,RmvUserBtn);
+        //======================================================================
+        VBox NSDVB2 = new VBox(15);
+        NSDVB2.setPadding(new Insets(15,15,15,15));
+        NSDVB2.setSpacing(15);
+        
+        Label ClientTitleLbl = new Label("Client Settings");
+        ClientTitleLbl.setUnderline(true);
+        ClientTitleLbl.setFont(new Font(20));
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD2hb1 = new HBox(15);
+        NSD2hb1.setPadding(new Insets(5,5,5,5));
+        NSD2hb1.setSpacing(10);
+        
+        Label NameClientLbl = new Label("Name:");
+        NameClientLbl.setMinWidth(100);
+        
+        TextField NameClientTF = new TextField();
+        NameClientTF.setPrefWidth(200);
+        
+        NSD2hb1.getChildren().addAll(NameClientLbl,NameClientTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD2hb2 = new HBox(15);
+        NSD2hb2.setPadding(new Insets(5,5,5,5));
+        NSD2hb2.setSpacing(10);
+        
+        Label AddressClientLbl = new Label("Address:");
+        AddressClientLbl.setMinWidth(100);
+        
+        TextField AddressClientTF = new TextField();
+        AddressClientTF.setPrefWidth(200);
+        
+        NSD2hb2.getChildren().addAll(AddressClientLbl,AddressClientTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD2hb3 = new HBox(15);
+        NSD2hb3.setPadding(new Insets(5,5,5,5));
+        NSD2hb3.setSpacing(10);
+        
+        Label PhoneClientLbl = new Label("Phone:");
+        PhoneClientLbl.setMinWidth(100);
+        
+        TextField PhoneClientTF = new TextField();
+        PhoneClientTF.setPrefWidth(200);
+        
+        NSD2hb3.getChildren().addAll(PhoneClientLbl,PhoneClientTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+       /* HBox NSD2hb4 = new HBox(15);
+        NSD2hb4.setPadding(new Insets(5,5,5,5));
+        NSD2hb4.setSpacing(10);
+        */
+        Button AddClientBtn = new Button("Add");
+        AddClientBtn.setPrefSize(200, 80);
+        AddClientBtn.setFont(new Font(20));
+        
+        Button ShowClientBtn = new Button("Show");
+        ShowClientBtn.setPrefSize(200, 80);
+        ShowClientBtn.setFont(new Font(20));
+        
+        Button EditClientBtn = new Button("Edit\n(Press \"Show\" before");
+        EditClientBtn.setPrefSize(200, 80);
+        EditClientBtn.setFont(new Font(20));
+        
+        Button RmvClientBtn = new Button("Delete User\n(Only need\n Name)");
+        RmvClientBtn.setPrefSize(200, 100);
+        RmvClientBtn.setFont(new Font(20));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        //----------------------------------------------------------------------
+        NSDVB2.getChildren().addAll(ClientTitleLbl,NSD2hb1,NSD2hb2,NSD2hb3,AddClientBtn,ShowClientBtn,EditClientBtn,RmvClientBtn);
+        
+        //======================================================================
+         VBox NSDVB3 = new VBox(15);
+        NSDVB3.setPadding(new Insets(15,15,15,15));
+        NSDVB3.setSpacing(15);
+        
+        Label EmpTitleLbl = new Label("Employees Settings");
+        EmpTitleLbl.setUnderline(true);
+        EmpTitleLbl.setFont(new Font(20));
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD3hb1 = new HBox(15);
+        NSD3hb1.setPadding(new Insets(5,5,5,5));
+        NSD3hb1.setSpacing(10);
+        
+        Label NameEmpLbl = new Label("Name:");
+        NameEmpLbl.setMinWidth(100);
+        
+        TextField NameEmpTF = new TextField();
+        NameEmpTF.setPrefWidth(200);
+        
+        NSD3hb1.getChildren().addAll(NameEmpLbl,NameEmpTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD3hb2 = new HBox(15);
+        NSD3hb2.setPadding(new Insets(5,5,5,5));
+        NSD3hb2.setSpacing(10);
+        
+        Label AddressEmptLbl = new Label("Address:");
+        AddressEmptLbl.setMinWidth(100);
+        
+        TextField AddressEmpTF = new TextField();
+        AddressEmpTF.setPrefWidth(200);
+        
+        NSD3hb2.getChildren().addAll(AddressEmptLbl,AddressEmpTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD3hb3 = new HBox(15);
+        NSD3hb3.setPadding(new Insets(5,5,5,5));
+        NSD3hb3.setSpacing(10);
+        
+        Label PhoneEmpLbl = new Label("Phone:");
+        PhoneEmpLbl.setMinWidth(100);
+        
+        TextField PhoneEmpTF = new TextField();
+        PhoneEmpTF.setPrefWidth(200);
+        
+        NSD3hb3.getChildren().addAll(PhoneEmpLbl,PhoneEmpTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD3hb4 = new HBox(15);
+        NSD3hb4.setPadding(new Insets(5,5,5,5));
+        NSD3hb4.setSpacing(10);
+        
+        Label PosEmpLbl = new Label("Position:");
+        PosEmpLbl.setMinWidth(100);
+        
+        TextField PosEmpTF = new TextField();
+        PosEmpTF.setPrefWidth(200);
+        
+        NSD3hb4.getChildren().addAll(PosEmpLbl,PosEmpTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox NSD3hb5 = new HBox(15);
+        NSD3hb5.setPadding(new Insets(5,5,5,5));
+        NSD3hb5.setSpacing(10);
+        
+        Label SalaryEmpLbl = new Label("Salary:");
+        SalaryEmpLbl.setMinWidth(100);
+        
+        TextField SalaryEmpTF = new TextField();
+        SalaryEmpTF.setPrefWidth(200);
+        
+        NSD3hb5.getChildren().addAll(SalaryEmpLbl,SalaryEmpTF);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+       /* HBox NSD2hb4 = new HBox(15);
+        NSD2hb4.setPadding(new Insets(5,5,5,5));
+        NSD2hb4.setSpacing(10);
+        */
+        Button AddEmpBtn = new Button("Add");
+        AddEmpBtn.setPrefSize(200, 80);
+        AddEmpBtn.setFont(new Font(20));
+        
+        Button ShowEmpBtn = new Button("Show");
+        ShowEmpBtn.setPrefSize(200, 80);
+        ShowEmpBtn.setFont(new Font(20));
+        
+        Button EditEmpBtn = new Button("Edit\n(Press \"Show\" before");
+        EditEmpBtn.setPrefSize(200, 80);
+        EditEmpBtn.setFont(new Font(20));
+        
+        Button RmvEmpBtn = new Button("Delete User\n(Only need\n Name)");
+        RmvEmpBtn.setPrefSize(200, 100);
+        RmvEmpBtn.setFont(new Font(20));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        //----------------------------------------------------------------------
+        NSDVB3.getChildren().addAll(EmpTitleLbl,NSD3hb1,NSD3hb2,NSD3hb3,NSD3hb4,NSD3hb5,AddEmpBtn,ShowEmpBtn,EditEmpBtn,RmvEmpBtn);
+        
+        //======================================================================
+        
+        mainNSDhb.getChildren().addAll(NSDVB1,NSDVB2,NSDVB3);
+        //NSDtab3 end-----------------------------------------------------------
+        //Resultanttab4 begins--------------------------------------------------
+        
+        Tab Resultanttab4 = new Tab("Resultant");
+        TabPane subTabPane = new TabPane();
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+        Tab StckPrdctsRsltsTab = new Tab("Stock");
+        
+        int EmpTbWidth = 1250;
+        
+        ResultsTable = new TableView<Results>();
+        ResultsTable.setTableMenuButtonVisible(true);
+        ResultsTable.setMaxWidth(EmpTbWidth);
+        ResultsTable.setMaxHeight(750);
+        ResultsTable.setLayoutX(10);
+        ResultsTable.setLayoutY(220);
+        
+        setColumns(11);
+        
+        ResultsTable.getColumns().addAll(BrcdClmn,namePrdctClmn,TypeClmn,PriceeClmn,VATClmn,CosttClmn,DscnttClmn,ProfitClmn,RmndQuntClmn,LastModifiedDateClmn,ExpryDateClmn);
+        //ResultsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        
+        VBox mainRsltVBT1 = new VBox(15);
+        mainRsltVBT1.setPadding(new Insets(15,15,15,15));
+        mainRsltVBT1.setSpacing(15);
+        
+        subTabPane.getTabs().add(StckPrdctsRsltsTab);
+        subTabPane.setPrefHeight(500);
+       
+        mainRsltVBT1.getChildren().addAll(ResultsTable);
+        StckPrdctsRsltsTab.setContent(mainRsltVBT1);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        VBox subRsltsVB = new VBox(15);
+        subRsltsVB.setPadding(new Insets(5,5,5,5));
+        subRsltsVB.setSpacing(10);
+        //subRsltsVB.setStyle("-fx-background-color: gray");
+        subRsltsVB.setMaxWidth(500);
+        mainRsltVBT1.getChildren().add(subRsltsVB);
+        subRsltsVB.setAlignment(Pos.CENTER_RIGHT);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox RHB1_1 = new HBox(15);
+        RHB1_1.setPadding(new Insets(5,5,5,5));
+        RHB1_1.setSpacing(10);
+        //RHB1_1.setAlignment(Pos.CENTER_RIGHT);
+        
+        Label SrchRsltLbl = new Label("Search:");
+        SrchRsltLbl.setMinWidth(100);
+        
+        TextField SrchRsltTF = new TextField();
+        SrchRsltTF.setPrefWidth(200);
+        
+        Button SrchRsltBtn = new Button("Search");
+        
+        CheckBox includeDateChk = new CheckBox("Specify Date");
+        
+        RHB1_1.getChildren().addAll(SrchRsltLbl,SrchRsltTF,SrchRsltBtn,includeDateChk);
+        subRsltsVB.getChildren().add(RHB1_1);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        HBox RHB1_2 = new HBox(15);
+        RHB1_2.setPadding(new Insets(5,5,5,5));
+        RHB1_2.setSpacing(10);
+        RHB1_2.setAlignment(Pos.CENTER);
+        
+        ComboBox SrchRstltCB = new ComboBox();
+        SrchRstltCB.setPrefWidth(270);
+        
+        RHB1_2.getChildren().addAll(SrchRstltCB);
+        subRsltsVB.getChildren().add(RHB1_2);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        RadioButton GnrlSrchRB = new RadioButton("General");
+        GnrlSrchRB.setPrefWidth(150);
+        GnrlSrchRB.setSelected(true);
+        
+        RadioButton CodeSrchRB = new RadioButton("Code");
+        CodeSrchRB.setPrefWidth(150);
+        
+        RadioButton NameSrchRB = new RadioButton("Name");
+        NameSrchRB.setPrefWidth(150);
+        
+        ToggleGroup SrchTG = new ToggleGroup();
+        SrchTG.getToggles().addAll(GnrlSrchRB,CodeSrchRB,NameSrchRB);
+        
+        DatePicker DtPk = new DatePicker();
+        
+        RadioButton EnrtyDtSrchRB = new RadioButton("Entry Date");
+        EnrtyDtSrchRB.setPrefWidth(150);
+        EnrtyDtSrchRB.setSelected(true);
+        
+        RadioButton ExpryDtSrchRB = new RadioButton("Expiry Date");
+        ExpryDtSrchRB.setPrefWidth(150);
+        
+        ToggleGroup DtSrchTG = new ToggleGroup();
+        DtSrchTG.getToggles().addAll(EnrtyDtSrchRB,ExpryDtSrchRB);
+        
+        
+        subRsltsVB.getChildren().addAll(GnrlSrchRB,NameSrchRB,CodeSrchRB,DtPk,EnrtyDtSrchRB,ExpryDtSrchRB);
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+        Tab DailyPrdctsRsltsTab = new Tab("Daily Sale");
+        
+        ResultsTable1 = new TableView<Results>();
+        ResultsTable1.setTableMenuButtonVisible(true);
+        ResultsTable1.setMaxWidth(EmpTbWidth);
+        ResultsTable1.setMaxHeight(750);
+        ResultsTable1.setLayoutX(10);
+        ResultsTable1.setLayoutY(220);
+        
+        setColumns(9);
+        
+        ResultsTable1.getColumns().addAll(BrcdClmn,namePrdctClmn,CosttClmn,PriceeClmn,ProfitClmn,TypeClmn,TTlDscnttClmn,VATClmn,DscrpttClmn);
+        
+        VBox mainRsltVBT2 = new VBox(15);
+        mainRsltVBT2.setPadding(new Insets(15,15,15,15));
+        mainRsltVBT2.setSpacing(15);
+        
+        subTabPane.getTabs().add(DailyPrdctsRsltsTab);
+        subTabPane.setPrefHeight(500);
+        
+        mainRsltVBT2.getChildren().add(ResultsTable1);
+        
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox RHB2_1 = new HBox(15);
+        RHB2_1.setPadding(new Insets(5,5,5,5));
+        RHB2_1.setSpacing(10);
+        //RHB2_1.setMaxWidth(400);
+        //RHB2_1.setStyle("-fx-background-color: gray");
+        
+        Label SrchRslt2Lbl = new Label("Search:");
+        SrchRslt2Lbl.setMinWidth(85);
+        
+        ComboBox SrchRslt2CB = new ComboBox();
+        SrchRslt2CB.setPrefWidth(200);
+        
+        DatePicker dt = new DatePicker();
+        CheckBox DateIncludedChk = new CheckBox("Specify Date");
+        
+        Button SrchRslt2Btn = new Button("Search");
+        
+        RHB2_1.getChildren().addAll(SrchRslt2Lbl,SrchRslt2CB,SrchRslt2Btn,dt,DateIncludedChk);
+        mainRsltVBT2.getChildren().add(RHB2_1);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        VBox RVB2_1 = new VBox(15);
+        RVB2_1.setPadding(new Insets(5,5,5,5));
+        RVB2_1.setSpacing(10);
+        RVB2_1.setAlignment(Pos.CENTER);
+        RVB2_1.setMaxWidth(400);
+        //RVB2_1.setStyle("-fx-background-color: gray");
+        
+        ComboBox CodeSrchRslt2CB = new ComboBox();
+        CodeSrchRslt2CB.setPrefWidth(200);
+        
+        RadioButton DateDailySrchRB = new RadioButton("Date");
+        DateDailySrchRB.setPrefWidth(150);
+        DateDailySrchRB.setSelected(true);
+        
+        RadioButton PrdctNmSrchRB = new RadioButton("Product Name");
+        PrdctNmSrchRB.setPrefWidth(150);
+        
+        RadioButton PrdctCodeSrchRB = new RadioButton("Product Code");
+        PrdctCodeSrchRB.setPrefWidth(150);
+        
+        
+        ToggleGroup DailySrchTG = new ToggleGroup();
+        DailySrchTG.getToggles().addAll(DateDailySrchRB,PrdctNmSrchRB,PrdctCodeSrchRB);
+        
+        RVB2_1.getChildren().addAll(CodeSrchRslt2CB,DateDailySrchRB,PrdctNmSrchRB,PrdctCodeSrchRB);
+        mainRsltVBT2.getChildren().add(RVB2_1);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox RHB2_2 = new HBox(15);
+        RHB2_2.setPadding(new Insets(5,5,5,5));
+        RHB2_2.setSpacing(10);
+        RHB2_2.setMaxWidth(400);
+        //RHB2_1.setStyle("-fx-background-color: gray");
+        
+        Label CostsRslt2Lbl = new Label("Costs:");
+        CostsRslt2Lbl.setMinWidth(85);
+        
+        TextField CostsRslt2TF = new TextField();
+        CostsRslt2TF.setPrefWidth(200);
+        
+        RHB2_2.getChildren().addAll(CostsRslt2Lbl,CostsRslt2TF);
+        mainRsltVBT2.getChildren().add(RHB2_2);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox RHB2_3 = new HBox(15);
+        RHB2_3.setPadding(new Insets(5,5,5,5));
+        RHB2_3.setSpacing(10);
+        RHB2_3.setMaxWidth(400);
+        //RHB2_1.setStyle("-fx-background-color: gray");
+        
+        Label ProfitRslt2Lbl = new Label("Profit:");
+        ProfitRslt2Lbl.setMinWidth(85);
+        
+        TextField ProfitRslt2TF = new TextField();
+        ProfitRslt2TF.setPrefWidth(200);
+        
+        RHB2_3.getChildren().addAll(ProfitRslt2Lbl,ProfitRslt2TF);
+        mainRsltVBT2.getChildren().add(RHB2_3);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        DailyPrdctsRsltsTab.setContent(mainRsltVBT2);
+        
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+        Tab ClntsRsltsTab = new Tab("Clients");
+        
+        ResultsTable2 = new TableView<Results>();
+        ResultsTable2.setTableMenuButtonVisible(true);
+        ResultsTable2.setMaxWidth(EmpTbWidth);
+        ResultsTable2.setMaxHeight(750);
+        ResultsTable2.setLayoutX(10);
+        ResultsTable2.setLayoutY(220);
+        
+        setColumns(8);
+        
+        ResultsTable2.getColumns().addAll(ClntClmn,namePrdctClmn,CosttClmn,PriceeClmn,ProfitClmn,DscnttClmn,TTlDscnttClmn,VATClmn);
+        //Results( String Clnt, String namePrdct, double Cost, double Price, double Profit, double Dscnt, double TTlDscnt, double VAT)
+        
+        VBox mainRsltVBT3 = new VBox(15);
+        mainRsltVBT3.setPadding(new Insets(15,15,15,15));
+        mainRsltVBT3.setSpacing(15);
+        
+        subTabPane.getTabs().add(ClntsRsltsTab);
+        subTabPane.setPrefHeight(500);
+        
+        mainRsltVBT3.getChildren().add(ResultsTable2);
+        
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox RHB3_1 = new HBox(15);
+        RHB3_1.setPadding(new Insets(5,5,5,5));
+        RHB3_1.setSpacing(10);
+        //RHB3_1.setMaxWidth(400);
+        //RHB2_1.setStyle("-fx-background-color: gray");
+        
+        Label SrchClntRslt3Lbl = new Label("Search:");
+        SrchClntRslt3Lbl.setMinWidth(100);
+        
+        ComboBox SrchClntRslt3CB = new ComboBox();
+        SrchClntRslt3CB.setPrefWidth(200);
+        
+        Button SrchClntRslt3Btn = new Button("Search");
+        
+        DatePicker ClntDtPk = new DatePicker();
+        CheckBox ClntDtChk = new CheckBox("Specify Date");
+        
+        RHB3_1.getChildren().addAll(SrchClntRslt3Lbl,SrchClntRslt3CB,SrchClntRslt3Btn,ClntDtPk,ClntDtChk);
+        mainRsltVBT3.getChildren().add(RHB3_1);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        VBox RVB3_1 = new VBox(15);
+        RVB3_1.setPadding(new Insets(5,5,5,5));
+        RVB3_1.setSpacing(10);
+        RVB3_1.setAlignment(Pos.CENTER_RIGHT);
+        RVB3_1.setMaxWidth(400);
+        //RVB2_1.setStyle("-fx-background-color: gray");
+        
+        RadioButton DbtSrchRB = new RadioButton("Debit");
+        DbtSrchRB.setPrefWidth(150);
+        
+        RadioButton CrdtSrchRB = new RadioButton("Credit");
+        CrdtSrchRB.setPrefWidth(150);
+        
+        RadioButton AllSrchRB = new RadioButton("All");
+        AllSrchRB.setPrefWidth(150);
+        AllSrchRB.setSelected(true);
+        
+        
+        ToggleGroup ClntSrchTG = new ToggleGroup();
+        ClntSrchTG.getToggles().addAll(DbtSrchRB,CrdtSrchRB,AllSrchRB);
+        
+        RVB3_1.getChildren().addAll(AllSrchRB,DbtSrchRB,CrdtSrchRB);
+        mainRsltVBT3.getChildren().add(RVB3_1);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        HBox RHB3_2 = new HBox(15);
+        RHB3_2.setPadding(new Insets(5,5,5,5));
+        RHB3_2.setSpacing(10);
+        RHB3_2.setMaxWidth(400);
+        //RHB2_1.setStyle("-fx-background-color: gray");
+        
+        Label DbtRslt3Lbl = new Label("Debit:");
+        DbtRslt3Lbl.setMinWidth(100);
+        
+        TextField DebitRslt3TF = new TextField();
+        DebitRslt3TF.setPrefWidth(200);
+        
+        RHB3_2.getChildren().addAll(DbtRslt3Lbl,DebitRslt3TF);
+        mainRsltVBT3.getChildren().add(RHB3_2);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        ClntsRsltsTab.setContent(mainRsltVBT3);
+        
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        //======================================================================
+        Resultanttab4.setContent(subTabPane);
+        //Resultanttab4 ends----------------------------------------------------
+        
+        //Employeestab5 begins--------------------------------------------------
+        
+        Tab Employeestab5 = new Tab("Employees Payments");
+        
+        
+        EmpResultsTable = new TableView<EmpResults>();
+        EmpResultsTable.setTableMenuButtonVisible(true);
+        EmpResultsTable.setMaxWidth(EmpTbWidth);
+        EmpResultsTable.setMaxHeight(750);
+        EmpResultsTable.setLayoutX(10);
+        EmpResultsTable.setLayoutY(220);
+        
+        IDClmn = new TableColumn<EmpResults,String>("ID");
+        IDClmn.setCellValueFactory(new PropertyValueFactory<>("ID"));
+        IDClmn.setMinWidth(EmpTbWidth/6);
+       
+        nameClmn = new TableColumn<EmpResults,String>("Name");
+        nameClmn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameClmn.setMinWidth(EmpTbWidth/6);
+        
+        salaryClmn = new TableColumn<EmpResults,Double>("Salary");
+        salaryClmn.setCellValueFactory(new PropertyValueFactory<>("salary"));
+        salaryClmn.setMinWidth(EmpTbWidth/6);
+        
+        dateClmn= new TableColumn<EmpResults,String>("Date");
+        dateClmn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        dateClmn.setMinWidth(EmpTbWidth/6);
+        
+        paymentClmn = new TableColumn<EmpResults,Double>("Payment");
+        paymentClmn.setCellValueFactory(new PropertyValueFactory<>("payment"));
+        paymentClmn.setMinWidth(EmpTbWidth/6);
+        
+        remainedClmn = new TableColumn<EmpResults,Double>("Remained");
+        remainedClmn.setCellValueFactory(new PropertyValueFactory<>("remained"));
+        remainedClmn.setMinWidth(EmpTbWidth/6);
+       
+        EmpResultsTable.getColumns().addAll(IDClmn,nameClmn,salaryClmn,dateClmn,paymentClmn,remainedClmn);
+        
+        VBox mainEmpBV = new VBox(15);
+        mainEmpBV.setPadding(new Insets(15,15,15,15));
+        mainEmpBV.setSpacing(15);
+        
+        mainEmpBV.getChildren().add(EmpResultsTable);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Pane downPane = new Pane();
+        //----------------------------------------------------------------------
+        VBox vb1 = new VBox(15);
+        vb1.setPadding(new Insets(5,5,5,5));
+        vb1.setSpacing(10);
+        vb1.setLayoutX(10);
+        vb1.setLayoutY(10);
+        vb1.setAlignment(Pos.CENTER_RIGHT);
+        vb1.setStyle("-fx-background-color: gray");
+        
+        HBox vb1hb1 = new HBox(15);
+        vb1hb1.setPadding(new Insets(5,5,5,5));
+        vb1hb1.setSpacing(20);
+        
+        Label SearchEmptLbl = new Label("Search:");
+        SearchEmptLbl.setMinWidth(100);
+        SearchEmptLbl.setFont(new Font(20));
+        
+        ComboBox SearchEmpCB = new ComboBox();
+        SearchEmpCB.setPrefWidth(200);
+        
+        RadioButton NameRB = new RadioButton("Name");
+        NameRB.setPrefWidth(200);
+        NameRB.setSelected(true);
+        
+        vb1hb1.getChildren().addAll(SearchEmptLbl,SearchEmpCB,NameRB);
+                
+        HBox vb1hb2 = new HBox(15);
+        vb1hb2.setPadding(new Insets(5,5,5,5));
+        vb1hb2.setSpacing(20);
+        
+        Label SearchEmptIDLbl = new Label("Search:");
+        SearchEmptIDLbl.setMinWidth(100);
+        SearchEmptIDLbl.setFont(new Font(20));
+        SearchEmptIDLbl.setVisible(false);
+        
+        ComboBox SearchEmpIDCB = new ComboBox();
+        SearchEmpIDCB.setPrefWidth(200);
+        
+        RadioButton IDRB = new RadioButton("ID");
+        IDRB.setPrefWidth(200);
+        
+        
+        vb1hb2.getChildren().addAll(SearchEmptIDLbl,SearchEmpIDCB,IDRB);
+             
+        ToggleGroup NameDateTG = new ToggleGroup();
+        NameDateTG.getToggles().addAll(IDRB,NameRB);
+        
+        HBox vb1hb3 = new HBox(15);
+        vb1hb3.setPadding(new Insets(5,5,5,5));
+        vb1hb3.setSpacing(20);
+        
+        
+        Label DateEmptLbl = new Label("Date:");
+        DateEmptLbl.setMinWidth(100);
+        DateEmptLbl.setFont(new Font(20));
+        
+        DatePicker DateEmpDtPk = new DatePicker();
+        DateEmpDtPk.setPrefWidth(200);
+     
+        vb1hb3.getChildren().addAll(DateEmptLbl,DateEmpDtPk);        
+        
+        RadioButton CompleteRB = new RadioButton("Complete Date");
+        CompleteRB.setPrefWidth(150);
+        CompleteRB.setWrapText(true);
+        RadioButton MonthRB = new RadioButton("By Month");
+        MonthRB.setPrefWidth(150);
+        MonthRB.setSelected(true);
+        ToggleGroup SrchDateTG = new ToggleGroup();
+        SrchDateTG.getToggles().addAll(CompleteRB,MonthRB);
+        
+        Button SrchPmntEmpBtn = new Button("Search");
+        SrchPmntEmpBtn.setFont(new Font(20));
+        //----------------------------------------------------------------------
+        vb1.getChildren().addAll(vb1hb1,vb1hb2,vb1hb3,MonthRB,CompleteRB,SrchPmntEmpBtn);
+        //----------------------------------------------------------------------
+        
+        VBox vb2 = new VBox(15);
+        vb2.setPadding(new Insets(5,5,5,5));
+        vb2.setSpacing(10);
+        vb2.setLayoutX(800);
+        vb2.setLayoutY(10);
+        vb2.setAlignment(Pos.CENTER_RIGHT);
+        vb2.setStyle("-fx-background-color: gray");
+        
+        
+        HBox addPmntHb = new HBox(15);
+        addPmntHb.setPadding(new Insets(5,5,5,5));
+        addPmntHb.setSpacing(20);
+        
+        Label NamePmntEmptLbl = new Label("Name:");
+        NamePmntEmptLbl.setMinWidth(100);
+        NamePmntEmptLbl.setFont(new Font(20));
+        
+        ComboBox NamePmntEmptCB = new ComboBox();
+        NamePmntEmptCB.setPrefWidth(250);
+        
+        
+        addPmntHb.getChildren().addAll(NamePmntEmptLbl,NamePmntEmptCB);
+        
+        vb2.getChildren().add(addPmntHb);
+        
+        HBox addPmntHb1 = new HBox(15);
+        addPmntHb1.setPadding(new Insets(5,5,5,5));
+        addPmntHb1.setSpacing(20);
+        
+        Label PmnEmptLbl = new Label("Payment:");
+        PmnEmptLbl.setMinWidth(100);
+        PmnEmptLbl.setFont(new Font(20));
+        
+        TextField PaymentEmpTF = new TextField();
+        PaymentEmpTF.setPrefWidth(200);
+        
+        Label DlrPmntLbl = new Label("$");
+        DlrPmntLbl.setFont(new Font(20));
+        
+        addPmntHb1.getChildren().addAll(PmnEmptLbl,PaymentEmpTF,DlrPmntLbl);
+        vb2.getChildren().add(addPmntHb1);
+        
+        Button AddPmntEmpBtn = new Button("Add Payment");
+        AddPmntEmpBtn.setFont(new Font(20));
+        vb2.getChildren().add(AddPmntEmpBtn);
+        
+        //----------------------------------------------------------------------
+        downPane.getChildren().addAll(vb1,vb2);
+        mainEmpBV.getChildren().add(downPane);
+        //======================================================================
+        Employeestab5.setContent(mainEmpBV);
+        
+        //Employeestab5 ends----------------------------------------------------
+        
+        
+        
+        tabPane.getTabs().addAll(Purchasetab1,AERtab2,NSDtab3,Resultanttab4,Employeestab5);
+        mainPane.getChildren().add(tabPane);
+        
+        BorderPane root = new BorderPane();
+        root.setTop(mn);
+        root.setCenter(mainPane);
+        
+        Scene scene = new Scene(root, 1500, 1100);
+        
+        primaryStage.setTitle("Advanced P.O.S.");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        
+        stage = primaryStage;
+    }
+
+    public void setColumns(int over){
+        int EmpTbWidth = 1250;
+        BrcdClmn = new TableColumn<Results,String>("Barcode");
+        BrcdClmn.setCellValueFactory(new PropertyValueFactory<>("Brcd"));
+        BrcdClmn.setMinWidth(EmpTbWidth/over);
+       
+        namePrdctClmn = new TableColumn<Results,String>("Name");
+        namePrdctClmn.setCellValueFactory(new PropertyValueFactory<>("namePrdct"));
+        namePrdctClmn.setMinWidth(EmpTbWidth/over);
+        
+        CosttClmn = new TableColumn<Results,Double>("Cost");
+        CosttClmn.setCellValueFactory(new PropertyValueFactory<>("Cost"));
+        CosttClmn.setMinWidth(EmpTbWidth/over);
+        
+        PriceeClmn= new TableColumn<Results,Double>("Price");
+        PriceeClmn.setCellValueFactory(new PropertyValueFactory<>("Price"));
+        PriceeClmn.setMinWidth(EmpTbWidth/over);
+        
+        ProfitClmn = new TableColumn<Results,Double>("Profit");
+        ProfitClmn.setCellValueFactory(new PropertyValueFactory<>("Profit"));
+        ProfitClmn.setMinWidth(EmpTbWidth/over);
+        
+        TypeClmn = new TableColumn<Results,String>("Type");
+        TypeClmn.setCellValueFactory(new PropertyValueFactory<>("Type"));
+        TypeClmn.setMinWidth(EmpTbWidth/over);
+       
+        DscnttClmn = new TableColumn<Results,Double>("Discount");
+        DscnttClmn.setCellValueFactory(new PropertyValueFactory<>("Dscnt"));
+        DscnttClmn.setMinWidth(EmpTbWidth/over);
+       
+        QuantityClmn = new TableColumn<Results,Double>("Quantity\nSold");
+        QuantityClmn.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        QuantityClmn.setMinWidth(EmpTbWidth/over);
+        
+        RmndQuntClmn = new TableColumn<Results,Double>("Remained\nin Stock");
+        RmndQuntClmn.setCellValueFactory(new PropertyValueFactory<>("RmndQunt"));
+        RmndQuntClmn.setMinWidth(EmpTbWidth/over);
+        
+        SplrClmn= new TableColumn<Results,String>("Supplier");
+        SplrClmn.setCellValueFactory(new PropertyValueFactory<>("Splr"));
+        SplrClmn.setMinWidth(EmpTbWidth/over);
+        
+        VATClmn = new TableColumn<Results,Double>("V.A.T.");
+        VATClmn.setCellValueFactory(new PropertyValueFactory<>("VAT"));
+        VATClmn.setMinWidth(EmpTbWidth/over);
+        
+        LastModifiedDateClmn = new TableColumn<Results,Double>("Last Modified \nDate");
+        LastModifiedDateClmn.setCellValueFactory(new PropertyValueFactory<>("LastModifiedDate"));
+        LastModifiedDateClmn.setMinWidth(EmpTbWidth/over);
+        
+        ExpryDateClmn = new TableColumn<Results,Double>("Expiry \nDate");
+        ExpryDateClmn.setCellValueFactory(new PropertyValueFactory<>("ExpryDate"));
+        ExpryDateClmn.setMinWidth(EmpTbWidth/over);
+        
+        DscrpttClmn = new TableColumn<Results,String>("Discription");
+        DscrpttClmn.setCellValueFactory(new PropertyValueFactory<>("Dscrpt"));
+        DscrpttClmn.setMinWidth(EmpTbWidth/over);
+        
+        TTlDscnttClmn = new TableColumn<Results,Double>("Total\nDiscount");
+        TTlDscnttClmn.setCellValueFactory(new PropertyValueFactory<>("TTlDscnt"));
+        TTlDscnttClmn.setMinWidth(EmpTbWidth/over);
+        
+        ClntClmn = new TableColumn<Results,String>("Client");
+        ClntClmn.setCellValueFactory(new PropertyValueFactory<>("Clnt"));
+        ClntClmn.setMinWidth(EmpTbWidth/over);
+    }
+    
+    public static LocalDate getDate(){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDate localDate = LocalDate.now();
+        System.out.println(dtf.format(localDate)); //2016/11/16
+        return localDate;
+    }
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+    
+////////////////////////////////////////////////////////////////////////////////
+    class MainPageMethods {
+  /*  
+    private double prft = 0,proft = 0;
+    private double pt = 0;
+    private int st;
+    private String cb,slctd;
+    private double price;
+    private double dsct;
+    private double cost,money = 0,oldmoney = 0;
+    private double rmng,rslt;
+    private int rmnd,week,year;
+    private Timer timer;
+    Calendar now = Calendar.getInstance();
+    String emp_name = null;
+    double pm;
+    double remn;
+    int idnum = 0;
+    int row = 0;
+    String car = null;
+    double vat = 0;
+    double rsltproft = 0,OnePRC = 0;
+    
+    private void PayBtnActionPerformed(javafx.event.ActionEvent evt) throws SQLException{                                       
+if(DebtTglBtnPur.isSelected()){
+        
+        try{  
+//step1 load the driver class  
+Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+ResultSet rs;
+
+double ttl = 0;
+
+int id;
+
+pm = Double.parseDouble(PaidTF.getText());
+id = Integer.parseInt(RcptTF.getText());
+cb = NameCB.getValue().toString();
+
+
+String type = TypeComboBox1.getValue().toString();
+
+if(type.equals("Cash $") || type.equals("Check $") || type.equals("Visa $") || type.equals("Master $") || type.equals("Amex $") || type.equals("Horizon $")){
+ttl = Double.parseDouble(RsltPurTF.getText());
+
+if(pm > ttl){
+            JOptionPane.showMessageDialog(null,
+                "Payment greater than Total!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+                        return;
+}
+
+ttl -= pm;
+RsltPurTF.setText((float)ttl + "");
+RsltDlrPurTF.setText((float)ttl*1500 + "");
+}
+else{
+    double Dttl = Double.parseDouble(RsltDlrPurTF.getText());
+    if(pm > Dttl){
+            JOptionPane.showMessageDialog(null,
+                "Payment greater than Total!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+                        return;
+    }
+    
+Dttl -= pm;
+RsltPurTF.setText((float)(Dttl/1500) + "");
+RsltDlrPurTF.setText((float)Dttl + "");
+pm /= 1500;
+
+}
+
+double dbt = 0;
+rs=stmt.executeQuery("select AMOUNT from ZDEBTPPL WHERE D_NAME = '"+cb+"'");
+
+while(rs.next()){
+    dbt = rs.getDouble("AMOUNT");
+}
+java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+stmt.executeUpdate("insert into ZPAYMENTDATE (RPTSERIAL,AMOUNTPAID,CUSTNAME,OLD_AMOUNT,TYPE_OF_PAYMENT,DATEE) values ("+id+","+pm+",'"+cb+"',"+dbt+",'"+type+"','"+sqlDate+"')"); 
+
+rs=stmt.executeQuery("select AMOUNT from ZDEBTPPL where D_NAME = '"+cb+"'");
+
+while(rs.next()){
+    ttl = rs.getDouble("AMOUNT");
+}
+ttl -= pm;
+
+stmt.executeUpdate("UPDATE ZDEBTPPL SET AMOUNT = " +ttl+ "where D_NAME = '"+cb+"'");
+
+con.close();  
+  
+}catch(Exception e){
+    JOptionPane.showMessageDialog(null,
+                "Something went wrong!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+
+}  
+}
+        
+    }                                      
+
+    private void RtrnPrdctBtnActionPerformed(javafx.event.ActionEvent evt) {                                             
+        ReturnFrame rf = new ReturnFrame();
+        rf.start(rf.getStage());
+        
+    }
+    
+    private void SplrRcptRetrnBTnActionPerformed(javafx.event.ActionEvent evt) {                                                 
+    
+        ReceiptReturn rc = new ReceiptReturn();
+        rc.start(rc.getStage());
+        
+    
+    }     
+        
+    private void DltPrdctPurBtnActionPerformed(javafx.event.ActionEvent evt) {                                         
+
+              try{  
+//step1 load the driver class  
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+        
+        double qunt = 0,rmd = 0;
+        ResultSet rs = null;
+        double rslt = 0;
+        for(int i=0;i<PurchaseTable.getItems().size();i++){
+            if(PurchaseTable.getSelectionModel().isSelected(i, CodeClmn)){
+              System.out.println("Product deleted is" + PrdctClmn.getCellData(i));
+                qunt = (double)QuntClmn.getCellData(i);
+            
+                rs=stmt.executeQuery("select REMAINEDSTOCK from zinstockkk where NAME = '"+(String)PrdctClmn.getCellData(i)+"'");
+            
+                while(rs.next()){
+                 rmd = rs.getDouble("REMAINEDSTOCK");
+                }
+                
+                rmd += qunt;
+                stmt.executeUpdate("UPDATE Zinstockkk SET REMAINEDSTOCK = "+rmd+" WHERE name = '"+(String)PrdctClmn.getCellData(i)+"'");
+            
+                rslt = Double.parseDouble(RsltPurTF.getText());
+                
+                rslt = rslt - (double)PriceClmn.getCellData(i);
+                RsltPurTF.setText(rslt+"");
+                RsltDlrPurTF.setText((rslt*1500)+"");
+                }
+            
+        }
+        PurchaseTable.getItems().remove(PurchaseTable.getSelectionModel().getSelectedItem());
+        }catch(Exception e){ System.out.println(e);}
+    }
+    
+    private void RsltPurBtnActionPerformed(javafx.event.ActionEvent evt) throws SQLException,IllegalAccessException,ClassNotFoundException {                                           
+        
+        
+        String nmm = (String)NameCB.getSelectionModel().getSelectedItem();
+        //System.out.println(nmm);
+        //step1 load the driver class
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+            double vat = 0;
+            
+            ResultSet rs;
+            rs=stmt.executeQuery("select PROFIT,VAT,name,CODE,COST,price,DISCOUNT,REMAINEDSTOCK,DISCRIPTION from ZINSTOCKKK where NAME = '"+nmm+"'");
+            st = 0;
+            st =  (int)QuntSpnrPurTF.getValue();
+            remn = 0;
+            cost = 0;
+            
+            while(rs.next()){
+                vat = rs.getDouble("VAT");
+                rsltproft += rs.getDouble("PROFIT") ;
+                price = rs.getDouble("PRICE")* (1 - rs.getDouble("DISCOUNT")/100);
+                remn = rs.getDouble("REMAINEDSTOCK");
+                
+                cost = rs.getDouble("COST") * (1 + vat/100);
+
+                
+                if(remn - st < 0){
+                    JOptionPane.showMessageDialog(null,
+                        "you can only buy: "+remn+"\nThis product is about to finish!!\nYou must buy some more of it.",
+                        "Error Message",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+
+                }
+                if(CheckBoxMenuItem.isSelected()){
+                    if(remn <= 10){
+                        JOptionPane.showMessageDialog(null,
+                            "This product is about to finish!!\nYou must buy some more of it.",
+                            "Error Message",
+                            JOptionPane.ERROR_MESSAGE);
+
+                    }
+                }
+                    //RmndPurTF.setText((rs.getFloat("REMAINEDSTOCK")-st)+"");
+                    remn -= st;
+                    //OnePRC = rs.getDouble("PRICE")* (1 - rs.getDouble("DISCOUNT")/100);
+                    
+                    PurchaseTable.getItems().add(new PurchaseProducts(rs.getString("CODE"),cost,price,st,rs.getDouble("DISCOUNT"),remn,rs.getString("DISCRIPTION"),nmm));
+                    //System.out.println(nmm);
+            }
+                //PurchaseTable.setEditable(false);
+                
+            
+                dsct = Float.parseFloat(OvrAllDiscTF.getText());
+                price *= (1 - dsct/100);
+                price *= st;
+               //PrcPurTF.setText((float)price+"");
+
+                rslt += price;
+
+                RsltPurTF.setText((float)rslt+"");
+            
+                stmt.executeUpdate("UPDATE ZINSTOCKKK SET REMAINEDSTOCK	 ="+ remn +" WHERE NAME = '"+nmm+"'");
+
+                RsltDlrPurTF.setText((float)((Double.parseDouble(RsltPurTF.getText()))*1500) + "");
+                con.close();
+                QuntSpnrPurTF.decrement((int) QuntSpnrPurTF.getValue());
+                
+                
+    }
+    
+    private void RetunPurBtnActionPerformed(javafx.event.ActionEvent evt) {                                            
+        
+            if(LLRadioButton.isSelected()){
+                RtrnTF.setText((float)((Double.parseDouble(RsltDlrPurTF.getText()))-(Double.parseDouble(RcvdTF.getText())))+ " L.L.");
+            }
+            else if(DollarRadioButton.isSelected()){
+                RtrnTF.setText((float)((Double.parseDouble(RsltPurTF.getText()))-(Double.parseDouble(RcvdTF.getText())))+ " $");
+            }
+            
+    }
+    
+    private void DragBtnActionPerformed(javafx.event.ActionEvent evt) throws SQLException{
+       
+        if(DrgAMntTF.getText().equals("") || DrgRsnTF.getText().equals("") || DrgNmTF.getText().equals("")){
+            JOptionPane.showMessageDialog(null,
+                "Please fill all fields!",
+                "Great!!",
+                JOptionPane.ERROR_MESSAGE);
+
+        }else{
+        
+        try{  
+Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+              
+  ResultSet rs=stmt.executeQuery("select * from IDS ");  
+//System.out.println("WorkDB1\tWorkDB2");
+java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+stmt.executeUpdate("insert into ZDRAGBOX (AMOUNT,REASON,DRGNAME,DATEE) values ("+DrgAMntTF.getText()+",'"+DrgRsnTF.getText()+"','"+DrgNmTF.getText()+"','"+sqlDate+"')");
+
+JOptionPane.showMessageDialog(null,
+                "Successed!",
+                "Great!!",
+                JOptionPane.INFORMATION_MESSAGE);
+
+
+//step5 close the connection object  
+con.close();  
+  
+}catch(Exception e){ System.out.println(e);
+            JOptionPane.showMessageDialog(null,
+                "Something went wrong!!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+
+}  
+  
+        
+    }                                        
+    }
+    
+    private void FnshBtnActionPerformed(javafx.event.ActionEvent evt) throws SQLException,IllegalAccessException,ClassNotFoundException, IOException{                                        
+
+        rslt = Double.parseDouble(RsltPurTF.getText()) * (1 - (Double.parseDouble(OvrAllDiscTF.getText()))/100) ;
+        if(rslt < 0 || Double.parseDouble(OvrAllDiscTF.getText()) < 0){        
+            JOptionPane.showMessageDialog(null,
+                "Discount should be between 0 and 100%",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+            OvrAllDiscTF.setText("0");
+            return;
+        }
+            printToPrinter();
+       
+        
+        RsltPurTF.setText("0");
+        OvrAllDiscTF.setText("0");        
+    }                                       
+
+    private void printToPrinter() throws IOException{
+
+//            FontFactory.registerDirectories();
+        try{  
+            
+//step1 load the driver class  
+Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+ResultSet rs;
+
+idnum = Integer.parseInt(RcptTF.getText());
+
+double amnt = 0;
+for (int i = 0; i < PurchaseTable.getItems().size();i++) {
+            java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+            stmt.executeUpdate("insert into ZDATESS (QUANTITY,DEBT,SERIAL,PRICE,CUSTNAME,PRODUCTNAME,DISCOUNT,DATEE,cost) values ("+(double)QuntClmn.getCellData(i)+",'YES',"+Double.parseDouble(RcptTF.getText())+","+(double)CostClmn.getCellData(i)+",'"+(String)DebtPrsnCB.getSelectionModel().getSelectedItem()+"','"+(String)PrdctClmn.getCellData(i)+"',"+(double)DscntClmn.getCellData(i)+",'"+sqlDate+"',"+(double)CostClmn.getCellData(i)+")");
+            
+            if(DebtTglBtnPur.isSelected()){
+                    //add invoice to payments with all attributes then update them when "finish" is pressed
+                    
+                    rs=stmt.executeQuery("select * from ZDEBTPPL where D_NAME = '"+(String)DebtPrsnCB.getSelectionModel().getSelectedItem()+"'");
+                    
+                    while(rs.next()){
+                        amnt = rs.getDouble("AMOUNT");
+                    }
+                      
+                    cost = 0;
+                    cost = Double.parseDouble(RsltPurTF.getText());
+                    amnt += cost;
+                    stmt.executeUpdate("UPDATE ZDEBTPPL SET AMOUNT ="+ amnt +" WHERE D_NAME = '"+(String)DebtPrsnCB.getSelectionModel().getSelectedItem()+"'");
+                    
+                }
+}
+
+cb = null;
+cb = (String) DebtPrsnCB.getSelectionModel().getSelectedItem();
+
+if(!DebtTglBtnPur.isSelected()){
+    stmt.executeUpdate("update ZPAYMENTS set P_DEBIT = 'NO' where INVSERIAL = "+idnum);
+       
+}
+else{
+    stmt.executeUpdate("update ZPAYMENTS set P_DEBIT = 'YES' where INVSERIAL = "+idnum);
+}
+    stmt.executeUpdate("update ZPAYMENTS set TOTAL = "+RsltPurTF.getText()+" where INVSERIAL = "+idnum);
+    stmt.executeUpdate("update ZPAYMENTS set OVRALLDISCOUNT = "+OvrAllDiscTF.getText()+" where INVSERIAL = "+idnum);
+//  stmt.executeUpdate("update ZPAYMENTS set P_DATE = TO_DATE('"+getDate()+"','YYYY/MM/DD') where INVSERIAL = "+idnum);
+    stmt.executeUpdate("update ZPAYMENTS set P_PROFIT = "+rsltproft+" where INVSERIAL = "+idnum);
+    stmt.executeUpdate("update ZPAYMENTS set CUSNAME = '"+cb+"' where INVSERIAL = "+idnum);
+
+    double pd;
+       rs = stmt.executeQuery("select AMOUNTPAID from zpaymentdate where rptserial = "+idnum);
+       while(rs.next()){
+           pd = rs.getDouble("AMOUNTPAID");
+       }
+
+     
+//OvrAllDiscTF.setText("0");
+       
+idnum++;
+java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+stmt.executeUpdate("insert into ZPAYMENTS (INVSERIAL,TOTAL,P_DATE) values ("+idnum+",0,'"+sqlDate+"')");
+    
+rsltproft = 0;
+  
+  PaidTF.setText(0+"");
+  
+        rslt = 0;
+        
+        QuntSpnrPurTF.decrement((int)QuntSpnrPurTF.getValue());
+        RsltPurTF.setText(rslt + "");
+        RsltDlrPurTF.setText(rslt + "");
+        DebtTglBtnPur.setSelected(false);
+        LLRadioButton.setSelected(true);
+        pm = 0;
+
+        RcptTF.setText(idnum + "");
+        stmt.executeUpdate("UPDATE IDS SET IDNUMD = "+idnum);
+        
+//step5 close the connection object  
+con.close();  
+  PurchaseTable.getItems().removeAll(PurchaseTable.getItems());
+
+}catch(Exception e){ System.out.println(e);
+JOptionPane.showMessageDialog(null,
+                e,
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+}  
+  
+    }
+*/
+    }
+                                               
+    public class PurchaseProducts{
+        
+        private final SimpleStringProperty discription;
+        private final SimpleDoubleProperty stock;
+        private final SimpleDoubleProperty discount;
+ 
+        private final SimpleIntegerProperty quantity;
+        private final SimpleDoubleProperty price;
+        private final SimpleDoubleProperty cost;
+ 
+        private final SimpleStringProperty code;
+        private final SimpleStringProperty product;
+        
+        private PurchaseProducts( String Code, double Cost,double Price, int Quantity, double Discount, double Stock, String Discription,String Product){
+            this.product = new SimpleStringProperty(Product);
+            this.code = new SimpleStringProperty(Code);
+            this.cost = new SimpleDoubleProperty(Cost);
+            this.price = new SimpleDoubleProperty(Price);
+            this.quantity = new SimpleIntegerProperty(Quantity);
+            this.discount = new SimpleDoubleProperty(Discount);
+            this.stock = new SimpleDoubleProperty(Stock);
+            this.discription = new SimpleStringProperty(Discription);
+        }
+ 
+        public String getProduct() {
+            return product.get();
+        }
+ 
+        public void setProduct(String Product) {
+            this.product.set(Product);
+        }
+ 
+        public String getCode() {
+            return code.get();
+        }
+ 
+        public void setCode(String Code) {
+            this.code.set(Code);
+        }
+
+        public double getCost() {
+            return cost.get();
+        }
+ 
+        public void setCost(double Cost) {
+            this.cost.set(Cost);
+        }
+        
+        public double getPrice() {
+            return price.get();
+        }
+ 
+        public void setPrice(double Price) {
+            this.price.set(Price);
+        }
+ 
+        public int getQuantity() {
+            return quantity.get();
+        }
+ 
+        public void setQuantity(int Quantity) {
+            this.quantity.set(Quantity);
+        }
+ 
+        public double getDiscount() {
+            return discount.get();
+        }
+ 
+        public void setDiscount(double Discount) {
+            this.discount.set(Discount);
+        }        
+        public double getStock() {
+            return stock.get();
+        }
+ 
+        public void setStock(double Stock) {
+            this.stock.set(Stock);
+        }
+ 
+        public String getDiscription() {
+            return discription.get();
+        }
+ 
+        public void setDiscription(String Discription) {
+            this.discription.set(Discription);
+        }        
+    }
+
+    public class EmpResults{
+        
+        private final SimpleStringProperty ID;
+        private final SimpleStringProperty name;
+        private final SimpleDoubleProperty salary;
+ 
+        private final SimpleStringProperty date;
+        private final SimpleDoubleProperty payment;
+        private final SimpleDoubleProperty remained;
+ 
+        
+        private EmpResults( String id, String name,double salary, String date, double payment, double remained){
+            this.ID = new SimpleStringProperty(id);
+            this.name = new SimpleStringProperty(name);
+            this.salary = new SimpleDoubleProperty(salary);
+            this.date = new SimpleStringProperty(date);
+            this.payment = new SimpleDoubleProperty(payment);
+            this.remained = new SimpleDoubleProperty(remained);
+            
+        }
+ 
+        public String getID() {
+            return ID.get();
+        }
+ 
+        public void setID(String ID) {
+            this.ID.set(ID);
+        }
+ 
+        public String getname() {
+            return name.get();
+        }
+ 
+        public void setname(String name) {
+            this.name.set(name);
+        }
+
+        public double getsalary() {
+            return salary.get();
+        }
+ 
+        public void setsalary(double salary) {
+            this.salary.set(salary);
+        }
+        
+        public String getdate() {
+            return date.get();
+        }
+ 
+        public void setdate(String date) {
+            this.date.set(date);
+        }
+ 
+        public double getpayment() {
+            return payment.get();
+        }
+ 
+        public void setpayment(double payment) {
+            this.payment.set(payment);
+        }
+ 
+        public double getremained() {
+            return remained.get();
+        }
+ 
+        public void setremained(double remained) {
+            this.remained.set(remained);
+        }        
+        
+    }
+
+    public class Results{
+        
+        private SimpleStringProperty Brcd;
+        private SimpleStringProperty namePrdct;
+        private SimpleDoubleProperty Cost;
+ 
+        private SimpleDoubleProperty Price;
+        private SimpleDoubleProperty Profit;
+        private SimpleStringProperty Type;
+ 
+        private SimpleDoubleProperty Dscnt;
+        private SimpleDoubleProperty TTlDscnt;
+        private SimpleDoubleProperty Quantity;
+        private SimpleDoubleProperty RmndQunt;
+ 
+        private SimpleStringProperty Splr;
+        private SimpleDoubleProperty VAT;
+        private SimpleStringProperty LastModifiedDate;
+        private SimpleStringProperty ExpryDate;
+        private SimpleStringProperty Dscrpt;
+        
+        private SimpleStringProperty Dbt;
+        private SimpleStringProperty Clnt;
+        
+        private Results( String Brcd, String namePrdct, double Cost, double Price, double Profit, String Type, double Dscnt, double RmndQunt, String Splr, double VAT, String LastModifiedDate, String ExpryDate, String Dscrpt){
+            this.Brcd = new SimpleStringProperty(Brcd);
+            this.namePrdct = new SimpleStringProperty(namePrdct);
+            this.Cost = new SimpleDoubleProperty(Cost);
+            this.Price = new SimpleDoubleProperty(Price);
+            this.Profit = new SimpleDoubleProperty(Profit);
+            this.Type = new SimpleStringProperty(Type);
+            this.Dscnt = new SimpleDoubleProperty(Dscnt);
+            this.ExpryDate = new SimpleStringProperty(ExpryDate);
+            this.RmndQunt = new SimpleDoubleProperty(RmndQunt);
+            this.Splr = new SimpleStringProperty(Splr);
+            this.VAT = new SimpleDoubleProperty(VAT);
+            this.LastModifiedDate = new SimpleStringProperty(LastModifiedDate);
+            this.Dscrpt = new SimpleStringProperty(Dscrpt);
+        }//Stock Results
+        
+        private Results( String Brcd, String namePrdct, double Cost, double Price, double Profit, String Type, double TTlDscnt, double VAT, String Dscrpt){
+            this.Brcd = new SimpleStringProperty(Brcd);
+            this.namePrdct = new SimpleStringProperty(namePrdct);
+            this.Cost = new SimpleDoubleProperty(Cost);
+            this.Price = new SimpleDoubleProperty(Price);
+            this.Profit = new SimpleDoubleProperty(Profit);
+            this.Type = new SimpleStringProperty(Type);
+            this.TTlDscnt = new SimpleDoubleProperty(TTlDscnt);
+            this.VAT = new SimpleDoubleProperty(VAT);
+            this.Dscrpt = new SimpleStringProperty(Dscrpt);
+        }
+ 
+        private Results( String Clnt, String namePrdct, double Cost, double Price, double Profit, double Dscnt, double TTlDscnt, double VAT){
+            this.Clnt = new SimpleStringProperty(Clnt);
+            this.namePrdct = new SimpleStringProperty(namePrdct);
+            this.Cost = new SimpleDoubleProperty(Cost);
+            this.Price = new SimpleDoubleProperty(Price);
+            this.Profit = new SimpleDoubleProperty(Profit);
+            this.TTlDscnt = new SimpleDoubleProperty(TTlDscnt);
+            this.VAT = new SimpleDoubleProperty(VAT);
+        }
+ 
+        public String getBrcd() {
+            return Brcd.get();
+        }
+ 
+        public void setBrcd(String Brcd) {
+            this.Brcd.set(Brcd);
+        }
+ 
+        public String getnamePrdct() {
+            return namePrdct.get();
+        }
+ 
+        public void setnamePrdct(String namePrdct) {
+            this.namePrdct.set(namePrdct);
+        }
+
+        public double getCost() {
+            return Cost.get();
+        }
+ 
+        public void setCost(double Cost) {
+            this.Cost.set(Cost);
+        }
+        
+        public double getPrice() {
+            return Price.get();
+        }
+ 
+        public void setPrice(double Price) {
+            this.Price.set(Price);
+        }
+ 
+        public double getProfit() {
+            return Profit.get();
+        }
+ 
+        public void setProfit(double Profit) {
+            this.Profit.set(Profit);
+        }
+ 
+        public String getType() {
+            return Type.get();
+        }
+ 
+        public void setType(String Type) {
+            this.Type.set(Type);
+        }        
+        
+        public double getDscnt() {
+            return Dscnt.get();
+        }
+ 
+        public void setDscnt(double Dscnt) {
+            this.Dscnt.set(Dscnt);
+        }
+ 
+        public double getQuantity() {
+            return Quantity.get();
+        }
+ 
+        public void setQuantity(double Quantity) {
+            this.Quantity.set(Quantity);
+        }
+
+        public double getRmndQunt() {
+            return Cost.get();
+        }
+ 
+        public void setRmndQunt(double RmndQunt) {
+            this.RmndQunt.set(RmndQunt);
+        }
+        
+        public double getVAT() {
+            return VAT.get();
+        }
+ 
+        public void setVAT(double VAT) {
+            this.VAT.set(VAT);
+        }
+ 
+        public String getLastModifiedDate() {
+            return LastModifiedDate.get();
+        }
+ 
+        public void setLastModifiedDate(String LastModifiedDate) {
+            this.LastModifiedDate.set(LastModifiedDate);
+        }
+ 
+        public String getSplr() {
+            return Splr.get();
+        }
+ 
+        public void setSplr(String Splr) {
+            this.Splr.set(Splr);
+        }        
+        
+        public String getDscrpt() {
+            return Dscrpt.get();
+        }
+ 
+        public void setDscrpt(String Dscrpt) {
+            this.Dscrpt.set(Dscrpt);
+        }        
+        
+        
+    }
+    
+}

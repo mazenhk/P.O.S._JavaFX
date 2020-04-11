@@ -1,0 +1,180 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package adv_prjct_pos;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author hk
+ */
+public class Pass extends Application {
+        int count = 0;
+        TextField userTF = new TextField();
+        PasswordField passTF = new PasswordField();
+        
+    @Override
+    public void start(Stage primaryStage) {
+        
+        GridPane gp = new GridPane();
+        Label userLbl = new Label("Username:");
+        Label passLbl = new Label("Password:");
+        
+        gp.add(userLbl, 0, 0);
+        gp.add(userTF, 1, 0);
+        gp.add(passLbl, 0, 1);
+        gp.add(passTF, 1, 1);
+        gp.setPadding(new Insets(15,15,15,15));
+        gp.setHgap(40);
+        gp.setVgap(10);
+        Button btn = new Button();
+        btn.setText("Enter");
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    //EnterSys();
+                    char [] c = passTF.getText().toCharArray();
+        if(count < 3){
+        if(passTF.getText().length() != 0){
+        if(isPasswordCorrect(c)){
+            MainPage mp = new MainPage();
+            mp.start(mp.getStage());
+            primaryStage.close();
+                
+        }
+        else{
+            JOptionPane.showMessageDialog(null,
+                "Please make sure of \"Username\" and \"Password\" \n Then try again",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+                
+            passTF.setText("");
+        
+        }}else{
+            JOptionPane.showMessageDialog(null,
+                "Please make sure of \"Username\" and \"Password\" \n Then try again",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+            passTF.setText("");
+        
+        }}
+        else{
+               JOptionPane.showMessageDialog(null,
+                "Hint: "+ hnt,
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+         count--;      
+        }
+        
+                } catch (Exception ex) {
+                    Logger.getLogger(Pass.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        StackPane sp = new StackPane();
+        sp.getChildren().add(btn);
+        
+        BorderPane root = new BorderPane();
+        root.setCenter(gp);
+        root.setBottom(sp);
+        
+        Scene scene = new Scene(root, 350, 150);
+        
+        primaryStage.setTitle("Password");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    String st,hnt ;
+    
+    private boolean isPasswordCorrect(char[] input) {
+    boolean isCorrect = true;
+    st = null;
+    char[] correctPassword = null;
+
+    try{  
+//step1 load the driver class  
+Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+ResultSet rs = stmt.executeQuery("select * from ZUSERSS where USERNAME = '"+userTF.getText()+"'");
+String usr = null;
+while(rs.next()){
+    usr = rs.getString("USERNAME");
+    st = rs.getString("PSWRD");
+    hnt = rs.getString("HINT");
+}  
+
+if (usr == null){
+               JOptionPane.showMessageDialog(null,
+                "No such User!!",
+                "Error Message",
+                JOptionPane.ERROR_MESSAGE);
+    
+}
+
+if(st == null)
+    return false;
+
+correctPassword = new char[st.length()];
+
+for(int i=0;i<st.length();i++){
+    correctPassword[i] = st.charAt(i);
+}
+
+    if (input.length != correctPassword.length) {
+        isCorrect = false;
+    } else{
+        
+        isCorrect = Arrays.equals (input, correctPassword);
+    }
+count++;
+    //Zero out the password.
+    Arrays.fill(correctPassword,'0');
+
+//step5 close the connection object  
+con.close();  
+  
+}catch(Exception e){ System.out.println(e);}  
+    
+    return isCorrect;
+}
+    private void EnterSys() throws Exception{
+        
+    }
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+    
+}

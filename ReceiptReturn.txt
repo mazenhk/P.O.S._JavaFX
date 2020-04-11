@@ -1,0 +1,456 @@
+﻿/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package adv_prjct_pos;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ *
+ * @author hk
+ */
+public class ReceiptReturn extends Application {
+
+    private Stage stage = new Stage();
+    
+    public Stage getStage(){
+        return stage;
+    }
+        
+    TextField IdNumTF;
+    TextField SplrTF;
+    TextField DlrTF;
+    TextField LLTF;
+    
+    ComboBox PrdctsCB;
+    
+    Spinner QuntSpinner;
+    
+    TextArea NotesTextPane;
+    
+    TableView PrdctsTable;
+    
+    TableColumn PrdctClmn;
+    TableColumn CodeClmn;
+    TableColumn CostClmn;
+    TableColumn QuntClmn;
+    TableColumn VATClmn;
+    TableColumn NoteClmn;
+    
+    @Override
+    public void start(Stage primaryStage) {
+        /*Button btn = new Button();
+        btn.setText("Say 'Hello World'");
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("Hello World!");
+            }
+        });
+        */
+        
+        
+        BorderPane mainPane = new BorderPane();
+        
+        ////////////////////////////////////////////////////////////////////////
+        VBox LeftBox = new VBox(15);
+        LeftBox.setPadding(new Insets(15,15,15,15));
+        LeftBox.setAlignment(Pos.CENTER);
+        
+        HBox hb1 = new HBox(15);
+        hb1.setPadding(new Insets(15,15,15,15));
+        hb1.setAlignment(Pos.CENTER_LEFT);
+        hb1.setSpacing(10);
+        
+        Label RcptIDLbl = new Label("Receipt ID:");
+        RcptIDLbl.setMinWidth(100);
+        IdNumTF = new TextField();
+        IdNumTF.setMinWidth(200);
+        IdNumTF.setEditable(false);
+        hb1.getChildren().addAll(RcptIDLbl,IdNumTF);
+        
+        HBox hb2 = new HBox(15);
+        hb2.setPadding(new Insets(15,15,15,15));
+        hb2.setAlignment(Pos.CENTER_LEFT);
+        hb2.setSpacing(10);
+        
+        Label SplrLbl = new Label("Supplier:");
+        SplrLbl.setMinWidth(100);
+        SplrTF = new TextField();
+        SplrTF.setMinWidth(200);
+        hb2.getChildren().addAll(SplrLbl,SplrTF);
+        
+        HBox hb3 = new HBox(15);
+        hb3.setPadding(new Insets(15,15,15,15));
+        hb3.setAlignment(Pos.CENTER_LEFT);
+        hb3.setSpacing(10);
+        
+        Label PrdctsLbl = new Label("Products:");
+        PrdctsLbl.setMinWidth(100);
+        PrdctsCB = new ComboBox();
+        PrdctsCB.setMinWidth(150);
+        Label xLbl = new Label("x");
+        xLbl.setMaxWidth(5);
+        QuntSpinner = new Spinner();
+        QuntSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,150,1));
+        QuntSpinner.setMaxWidth(70);
+        hb3.getChildren().addAll(PrdctsLbl,PrdctsCB,xLbl,QuntSpinner);
+        
+        HBox hb4 = new HBox(15);
+        hb4.setPadding(new Insets(15,15,15,15));
+        hb4.setAlignment(Pos.CENTER_LEFT);
+        hb4.setSpacing(10);
+        
+        Label NotesLbl = new Label("Notes:");
+        NotesLbl.setMinWidth(100);
+        NotesTextPane = new TextArea();
+        NotesTextPane.setMaxSize(250, 200);
+        hb4.getChildren().addAll(NotesLbl,NotesTextPane);
+        
+        HBox hb5 = new HBox(15);
+        hb5.setPadding(new Insets(15,15,15,15));
+        hb5.setAlignment(Pos.CENTER_LEFT);
+        hb5.setSpacing(10);
+        
+        Button FinishBtn = new Button("Finish");
+        hb5.getChildren().add(FinishBtn);
+        
+        HBox hb6 = new HBox(15);
+        hb6.setPadding(new Insets(15,15,15,15));
+        hb6.setAlignment(Pos.CENTER_RIGHT);
+        hb6.setSpacing(10);
+        
+        Button AddBTn = new Button("Add");
+        Button RmBtn = new Button("Remove");        
+        hb6.getChildren().addAll(AddBTn,RmBtn);
+        
+        
+        HBox hb7 = new HBox(15);
+        hb7.setPadding(new Insets(15,15,15,15));
+        hb7.setAlignment(Pos.CENTER);
+        hb7.setSpacing(100);
+        hb7.getChildren().addAll(hb5,hb6);
+        
+        LeftBox.getChildren().addAll(hb1,hb2,hb3,hb4,hb7);
+        
+        AddBTn.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                AddBTnActionPerformed(event);
+            }
+        });
+        
+        PrdctsCB.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                PrdctsCBItemStateChanged(event);
+            }
+        });
+        
+        RmBtn.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                RmBtnActionPerformed(event);
+            }
+        });
+                
+        FinishBtn.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
+                FinishBtnActionPerformed(event);
+            }
+        });
+                
+        
+        ////////////////////////////////////////////////////////////////////////
+        
+        VBox RightBox = new VBox(15);
+        
+        PrdctsTable = new TableView();
+        PrdctsTable.setTableMenuButtonVisible(true);
+        PrdctsTable.setMinWidth(850);
+        PrdctsTable.setMinHeight(500);
+        
+        PrdctClmn = new TableColumn("Product");
+        PrdctClmn.setMinWidth(850/6);
+        CodeClmn = new TableColumn("Code");
+        CodeClmn.setMinWidth(850/6);
+        CostClmn = new TableColumn("Cost");
+        CostClmn.setMinWidth(850/6);
+        QuntClmn = new TableColumn("Quantity");
+        QuntClmn.setMinWidth(850/6);
+        VATClmn = new TableColumn("V.A.T.");
+        VATClmn.setMinWidth(850/6);
+        NoteClmn = new TableColumn("Notes");
+        NoteClmn.setMinWidth(850/6);
+        
+        PrdctsTable.getColumns().addAll(PrdctClmn,CodeClmn,CostClmn,QuntClmn,VATClmn,NoteClmn);
+        
+        GridPane gp = new GridPane();
+        gp.setPadding(new Insets(15,15,15,15));
+        gp.setHgap(20);
+        gp.setVgap(20);
+        
+        Label TotalLbl = new Label("Total:");
+        DlrTF = new TextField("0");
+        Label DlrLbl = new Label("$");
+        LLTF = new TextField("0");
+        Label LLLbl = new Label("L.L.");
+        
+        gp.add(TotalLbl, 0, 0);
+        gp.add(DlrTF, 1, 0);
+        gp.add(DlrLbl, 2, 0);
+        gp.add(LLTF, 1, 1);
+        gp.add(LLLbl, 2, 1);
+        
+        RightBox.getChildren().addAll(PrdctsTable,gp);
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        try{
+
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+            System.out.println("connected!");
+            Statement stmt = con.createStatement();
+
+            ResultSet rs=stmt.executeQuery("select NAME from ZINSTOCKKK");
+
+            while(rs.next()){
+                PrdctsCB.getItems().add(rs.getString("NAME"));
+            }
+            rs=stmt.executeQuery("select rtrn_invc_id from IDS ");
+            int invsrl = 0;
+            while(rs.next()){
+                invsrl = rs.getInt("rtrn_invc_id");
+            }
+            IdNumTF.setText(invsrl + "");
+            rs=stmt.executeQuery("select SUPLLIER from zinstockkk where NAME = '"+(String)PrdctsCB.getSelectionModel().getSelectedItem()+"'");
+            while(rs.next()){
+                SplrTF.setText(rs.getString("SUPLLIER"));
+                System.out.println("done");
+            }
+            //step5 close the connection object
+            con.close();
+        }catch(Exception e){ System.out.println(e);}
+        ////////////////////////////////////////////////////////////////////////
+        
+        mainPane.setLeft(LeftBox);
+        mainPane.setRight(RightBox);
+        
+        StackPane root = new StackPane();
+        root.getChildren().add(mainPane);
+        
+        Scene scene = new Scene(root, 1500, 1200);
+        
+        primaryStage.setTitle("Debit Note");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        stage = primaryStage;
+    }
+
+    DefaultTableModel model;
+    private void AddBTnActionPerformed(javafx.event.ActionEvent evt) {                                       
+
+                /*model = (DefaultTableModel) PrdctsTable.getModel();
+               // model.getDataVector().removeAllElements();
+                model.fireTableDataChanged(); // notifies the JTable that the model has changed
+                */
+                
+        String nmm = (String)PrdctsCB.getSelectionModel().getSelectedItem();
+        try{
+            //step1 load the driver class
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+            ResultSet rs;
+            
+            rs=stmt.executeQuery("select * from ZINSTOCKKK where NAME = '"+nmm+"'");
+            double st = 0;
+            st =  (double)QuntSpinner.getValue();
+            double remn = 0;
+            double cost = 0, vat = 0;
+            rslt = Double.parseDouble(DlrTF.getText());
+            
+            while(rs.next()){
+                
+                remn = rs.getDouble("REMAINEDSTOCK");
+                
+                
+                vat = rs.getDouble("VAT");
+                cost = rs.getDouble("COST");
+
+                
+                if(remn - st < 0){
+                    JOptionPane.showMessageDialog(null,
+                        "you can only buy: "+remn+"\nThis product is about to finish!!\nYou must buy some more of it.",
+                        "Error Message",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+
+                }
+                    //RmndPurTF.setText((rs.getFloat("REMAINEDSTOCK")-st)+"");
+                    remn -= st;
+                    rslt += (cost * (1 + vat/100) * st);
+                    
+                    
+                    model.addRow(new Object[]{nmm,rs.getString("CODE"),cost,st,vat,NotesTextPane.getText()});
+                }
+            DlrTF.setText(rslt + "");
+            LLTF.setText((rslt*1500) + "");
+            
+            stmt.executeUpdate("UPDATE ZINSTOCKKK SET REMAINEDSTOCK ="+ remn +" WHERE NAME = '"+nmm+"'");
+            QuntSpinner.decrement((int)QuntSpinner.getValue());
+            NotesTextPane.setText(null);
+        }catch(Exception e){System.out.println(e);}        
+        
+    }                                      
+double rslt = 0;
+    private void RmBtnActionPerformed(javafx.event.ActionEvent evt) {                                      
+       
+        
+              try{  
+//step1 load the driver class  
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+        rslt = Double.parseDouble(DlrTF.getText());        
+        double qunt = 0,rmd = 0,cost = 0,vat = 0;
+        ResultSet rs;
+        
+        for(int i=0;i<PrdctsTable.getItems().lastIndexOf(PrdctsTable);i++){
+            if(PrdctsTable.getSelectionModel().isSelected(i, CodeClmn)){
+              
+                qunt = (double)PrdctsTable.getColumns().indexOf(3);//-----PrdctsTable.getItems().getValueAt(i, 3);
+            
+                rs=stmt.executeQuery("select REMAINEDSTOCK,cost,vat from zinstockkk where NAME = '"/*+(String)PrdctsTable.getValueAt(i, 0)+"'*/);
+            
+                while(rs.next()){
+                    vat = rs.getDouble("vat");
+                    cost = rs.getDouble("cost");
+                    rmd = rs.getDouble("REMAINEDSTOCK");
+                }
+                rslt -= (cost * (1 + vat/100) * qunt);
+                
+                rmd += qunt;
+                stmt.executeUpdate("UPDATE Zinstockkk SET REMAINEDSTOCK = "+rmd+" WHERE name = '"/*+(String)PrdctsTable.getValueAt(i, 0)+"'*/);
+                PrdctsTable.getSelectionModel().getSelectedCells().remove(PrdctsTable.getSelectionModel().getSelectedCells());
+            }
+        }
+        DlrTF.setText(rslt + "");
+        LLTF.setText((rslt*1500) + "");
+        }catch(Exception e){ System.out.println(e);}
+ 
+    }                                     
+
+    private void FinishBtnActionPerformed(javafx.event.ActionEvent evt) {                                          
+
+        if(!PrdctsTable.getItems().isEmpty()){
+        try{  
+        
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+            
+            ResultSet rs=stmt.executeQuery("select money_on_us from zsuppliers where NAME = '"+(String)SplrTF.getText()+"'");
+            double money = 0;
+            
+            while(rs.next()){
+                money = rs.getDouble("money_on_us");
+            }
+            
+            if(money > 0)
+                stmt.executeUpdate("update zsuppliers set money_on_us = "+(money - Double.parseDouble(DlrTF.getText()))+" where NAME = '"+(String)SplrTF.getText()+"'");
+            else
+                return;
+                        
+            java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+            for(int i=0;i<PrdctsTable.getItems().lastIndexOf(PrdctsTable);i++){
+                stmt.executeUpdate("insert into products_return (Invoice_ID,Splr_name,prdct_name,quantity,note,rtrn_date) values ("+Long.parseLong(IdNumTF.getText())+",'"+(String)SplrTF.getText()+"','"+(String)PrdctsCB.getSelectionModel().getSelectedItem()+"',"+(double)QuntSpinner.getValue()+",'"+NotesTextPane.getText()+"','"+sqlDate+"')");
+            }
+            
+            stmt.executeUpdate("update ids set rtrn_invc_id = "+ (Integer.parseInt(IdNumTF.getText()) + 1));
+            IdNumTF.setText((Integer.parseInt(IdNumTF.getText()) + 1) + "");
+            model.getDataVector().removeAllElements();
+            model.fireTableDataChanged(); // notifies the JTable that the model has changed
+            QuntSpinner.decrement((int)QuntSpinner.getValue());
+            NotesTextPane.setText(null);
+
+//            System.out.println("done!!");
+        }catch(Exception e){ System.out.println(e);}
+        
+        }
+    }                                         
+
+    private void PrdctsCBItemStateChanged(javafx.event.ActionEvent evt) {                                          
+ try{  
+        
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=WorkDB","sa","borntoLead123");
+            if(con != null)
+                System.out.println("connected!");
+            Statement stmt = con.createStatement();
+            
+            
+            ResultSet rs=stmt.executeQuery("select SUPLLIER from zinstockkk where NAME = '"+(String)PrdctsCB.getSelectionModel().getSelectedItem().toString()+"'");
+            
+            while(rs.next()){
+                SplrTF.setText(rs.getString("SUPLLIER"));
+            }
+        
+        }catch(Exception e){System.out.println(e);}
+        
+    }                                         
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+    
+}
